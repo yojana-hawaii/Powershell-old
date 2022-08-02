@@ -29,7 +29,7 @@ create table dbo.psADComputers (
 	OSVersion varchar(50) null,
 	[Location] varchar(50) null,
 	LastUpdated datetime2 not null,
-	BitLockerEnabled tinyint not null,
+	BitLockerEnabled tinyint null,
 
 );
 
