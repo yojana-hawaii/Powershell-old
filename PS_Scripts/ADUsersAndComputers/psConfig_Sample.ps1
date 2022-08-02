@@ -5,3 +5,7 @@ function fnConfig_GetPrimaryDC{
 function fnConfig_GetDomain{
     return "example.com"
 }
+
+function fnConfig_GetSqlConnectionString{
+    return "Server='server name';Integrated Security=True;Initial Catalog='ADWarehouse';"
+}
