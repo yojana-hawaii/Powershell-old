@@ -41,17 +41,23 @@ function fnLocal_OrganizeADProperties($pComputerList){
 }
 
 
-function fnLocal_GetAllComputerPrimaryAD{
-    $dc = fnAD_GetPrimaryDC
+function fnAD_GetADComputerDetails{
+    $dc = fnConfig_GetPrimaryDC
+
     write-host "Getting list of all computers from " $dc
-    $lADComputers = Get-ADComputer -Filter *  -Properties * -server $dc #-ResultSetSize 30
-    $lADComputers = fnLocal_OrganizeADProperties($lADComputers)
-    return $lADComputers
+    $adProperties = Get-ADComputer -Filter *  -Properties * -server $dc #-ResultSetSize 20
+    $adProperties = fnLocal_OrganizeADProperties($adProperties)
+
+    return $adProperties
+ 
 }
+function fnAD_GetManualComputerDetails($pComputerList){
+    $tempProperties = @()
+    $computers = $pComputerList.split(",")
+    foreach($comp in $computers){
+        $tempProperties += Get-ADComputer -Identity $comp -Properties * 
+        $adProperties = fnLocal_OrganizeADProperties($tempProperties)
+    }
 
-
-
-function fnAD_Main{
-    fnLocal_GetAllComputerPrimaryAD
-
+    return $adProperties
 }

@@ -5,7 +5,10 @@
 $gStart_time = fnTest_GetCurrentTime
 
 
-fnAD_Main
+# fnAD_GetADComputerDetails
+
+$computerList = "ayush-vm,aashish-21"
+fnAD_GetManualComputerDetails($computerList)
 
 $gEnd_time = fnTest_GetCurrentTime
 $gDuration = $gEnd_time - $gStart_time
