@@ -16,6 +16,7 @@ function fnLocal_Main($computerList){
         fnSp_InsertAdComputers($comp)
     }
 
+    fnSp_CleanUpAdComputers
     #run script to clean up AD Computers dates and move computer name to local computer data table
 }
 
