@@ -1,3 +1,5 @@
+. "$PSScriptRoot\psConfig.ps1"
+
 function fnLocal_GetStringFromObject($pObjParam){
     if ([string]::IsNullOrEmpty($pObjParam))
     {
@@ -11,9 +13,8 @@ function fnLocal_GetStringFromObject($pObjParam){
 
 function fnSp_InsertAdComputers($pComputer){
     $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnLocal_GetSqlConnectionString
+    $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
-    
     
     try{
         $conn.Open()
