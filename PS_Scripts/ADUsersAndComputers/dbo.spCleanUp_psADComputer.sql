@@ -46,6 +46,20 @@ begin
 	set vpn = 0
 	where vpn is null
 
+	update ADWarehouse.dbo.psADComputers
+	set LocalDetails = 1
+	where Active = 1 
+		and IPV4Address is not null
+		and OperatingSystem like '%Windows%' 
+		and OU not like '%no domain%'
+		and Name not like '%cluster%'
+		and Name not like '%replication%'
+
+
+	update ADWarehouse.dbo.psADComputers
+	set LocalDetails = 0
+	where LocalDetails is null
+
 )
 	
 end
