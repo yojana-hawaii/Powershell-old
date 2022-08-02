@@ -1,0 +1,57 @@
+
+. "$PSScriptRoot\psConfig.ps1"
+function fnLocal_Getwin10version($pVersionNumber){
+    $lWin10Version = ''
+    switch ($pVersionNumber) {
+        '10.0 (19044)' {  $lWin10Version = '21H2'; break }
+        '10.0 (19043)' {  $lWin10Version = '21H1'; break }
+        '10.0 (19042)' {  $lWin10Version = '20H2'; break }
+        '10.0 (19041)' {  $lWin10Version = '20H1'; break }
+        '10.0 (18363)' {  $lWin10Version = '19H2'; break }
+        '10.0 (18362)' {  $lWin10Version = '19H1'; break }
+        '10.0 (17763)' {  $lWin10Version = '1809'; break }
+        '10.0 (17134)' {  $lWin10Version = '1803'; break }
+        '10.0 (16299)' {  $lWin10Version = '1709'; break }
+        '10.0 (15063)' {  $lWin10Version = '1703'; break }
+        '10.0 (14393)' {  $lWin10Version = '1607'; break }
+        '10.0 (10586)' {  $lWin10Version = '1511'; break }
+        '10.0 (10240)' {  $lWin10Version = '1507'; break }
+        Default { $lWin10Version = $pVersionNumber }
+    }
+    return $lWin10Version
+}
+function fnLocal_OrganizeADProperties($pComputerList){
+    $properties = $pComputerList  | 
+                Select-Object Name, DistinguishedName, Created, Modified, UserAccountControl, sAMAccountName, `
+                    IPV4Address, LastLogonDate, LogonCount, `
+                    @{name="Description"; Expression={$_.Description.replace("'","")} }, `
+                    # @{name="OU"; Expression={fnLocal_GetOU($_.DistinguishedName)} }, `
+                    @{name="OU"; Expression={$_.CanonicalName } }, `
+                    @{name="Active"; Expression={if ($_.Enabled) {1} else {0} } },`
+                    @{name="Server"; Expression={if ($_.OperatingSystem -like '*server*' ) {1} else {0} } },`
+                    @{name="Thin_Client"; Expression={if ($_.OperatingSystem -like "*LTSC*" -and $_.Name -notlike '*POS*') {1} else {0} } }, `
+                    @{name="BitLockerPasswordDate"; Expression={Get-ADObject -Filter "objectClass -eq 'msFVE-RecoveryInformation' " -SearchBase $_.DistinguishedName -Properties whenCreated |
+                                                                         Sort-Object whenCreated -Descending | 
+                                                                         Select-Object -First 1 | 
+                                                                         Select-Object -ExpandProperty whenCreated} }, `
+                    OperatingSystem, OperatingSystemVersion, `
+                    @{name = 'OSVersion'; Expression= {fnLocal_Getwin10version($_.OperatingSystemVersion)} }
+                    
+    return $properties
+}
+
+
+function fnLocal_GetAllComputerPrimaryAD{
+    $dc = fnAD_GetPrimaryDC
+    write-host "Getting list of all computers from " $dc
+    $lADComputers = Get-ADComputer -Filter *  -Properties * -server $dc #-ResultSetSize 30
+    $lADComputers = fnLocal_OrganizeADProperties($lADComputers)
+    return $lADComputers
+}
+
+
+
+function fnAD_Main{
+    fnLocal_GetAllComputerPrimaryAD
+
+}
