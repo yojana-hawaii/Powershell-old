@@ -5,19 +5,31 @@
 
 $gStart_time = fnTest_GetCurrentTime
 
+function fnLocal_RunADStoredProc($pADComputerProperties){
+     foreach($comp in $ADComputersProperties){
+            fnSp_InsertAdComputers($comp)
+        }
+    
+        fnSp_CleanUpAdComputers
+        #run script to move computer name to local computer data table
+}
 function fnLocal_Main($computerList){
-    if( $null -eq $computerList){
-        $ADComputersProperties = fnAD_GetADComputerDetails
-    } else {
+    if( $null -ne $computerList){
         $ADComputersProperties = fnAD_GetManualComputerDetails($computerList)
     }
-
-    foreach($comp in $ADComputersProperties){
-        fnSp_InsertAdComputers($comp)
+    
+    <#Run AD part only it is 11pm#>
+    $time  = Get-Date -Format "HH:mm" 
+    if ($time -like "23*"){
+        if( $null -eq $computerList){
+            $ADComputersProperties = fnAD_GetADComputerDetails
+        }
+        fnLocal_RunADStoredProc($ADComputersProperties)
+    
+       
     }
 
-    fnSp_CleanUpAdComputers
-    #run script to clean up AD Computers dates and move computer name to local computer data table
+    return $ADComputersProperties
 }
 
 
@@ -25,7 +37,7 @@ function fnLocal_Main($computerList){
 $computerList = $null
 
 
-# $computerList = "ayush-vm,aashish-21"
+$computerList = "ayush-vm,aashish-21"
 
 fnLocal_Main($computerList)
 
