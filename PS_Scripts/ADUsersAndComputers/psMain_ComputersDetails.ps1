@@ -1,6 +1,7 @@
 
 . "$PSScriptRoot\psTest_GetDate.ps1"
 . "$PSScriptRoot\psAD_GetComputerDetails.ps1"
+. "$PSScriptRoot\psHardware_GetComputerDetails.ps1"
 . "$PSScriptRoot\psStoredProcedure.ps1"
 
 $gStart_time = fnTest_GetCurrentTime
@@ -16,6 +17,7 @@ function fnLocal_RunADStoredProc($pADComputerProperties){
 function fnLocal_Main($computerList){
     if( $null -ne $computerList){
         $ADComputersProperties = fnAD_GetManualComputerDetails($computerList)
+        $HardwareProperties = fnHardware_GetManualComputerDetails($ADComputersProperties)
     }
     
     <#Run AD part only it is 11pm#>
@@ -29,7 +31,7 @@ function fnLocal_Main($computerList){
        
     }
 
-    return $ADComputersProperties
+    return $HardwareProperties
 }
 
 
