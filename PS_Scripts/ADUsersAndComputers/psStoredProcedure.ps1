@@ -314,3 +314,37 @@ function fnSp_InsertSoftwareProc($pSoftwareDetails){
     return $sqlResult
 
 }
+
+function fnSp_GetRandomComputersUsingStoredProc{
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnLocal_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+    
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        write-host "Connection:" $conn.State
+        $cmd.CommandType = 'StoredProcedure'
+
+        $cmd.CommandText = "dbo.spGet_psRandomComputerToScan"
+
+        $cmd.CommandTimeout = 0
+        $result = $cmd.ExecuteReader()
+        
+        $data = New-Object System.Data.DataTable
+        $data.Load($result)
+
+
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    write-host "Connection:", $conn.State
+    return $data
+
+}

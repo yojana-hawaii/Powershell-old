@@ -25,25 +25,21 @@ function fnLocal_RunSoftwareStoredProc($pSoftwareProperties){
     }
     #    fnSp_CleanUpSoftwareDetails
 }
-function fnLocal_Main($computerList){
-    if( $null -ne $computerList){
-        $ADComputers = fnAD_GetManualComputerDetails($computerList)
+function fnLocal_ComputersToScan($pComputeList){
+    $total = $pComputeList.Count
+    $counter = 1
 
-        $total = $ADComputers.Count
-        $counter = 1
+    foreach($comp in $pComputeList){
+        write-host "Working on ", $comp.Name, "...", $counter, "of", $total
+        $HardwareProperties = fnHardware_GetLocalComputerDetails($comp)
+        fnLocal_RunHardwareStoredProc($HardwareProperties)
+        $SoftwareProperties = fnLSoftware_GetLocalDetailsRegistry($comp)
+        fnLocal_RunSoftwareStoredProc($SoftwareProperties)
 
-        foreach($comp in $ADComputers){
-            write-host "Working on ", $comp.Name, "...", $counter, "of", $total
-            $HardwareProperties = fnHardware_GetLocalComputerDetails($comp)
-            fnLocal_RunHardwareStoredProc($HardwareProperties)
-            $SoftwareProperties = fnLSoftware_GetLocalDetailsRegistry($comp)
-            fnLocal_RunSoftwareStoredProc($SoftwareProperties)
-
-            $counter++
-        }
-    
-
+        $counter++
     }
+}
+function fnLocal_Main($computerList){
     
     <#Run AD part only it is 11pm#>
     $time  = Get-Date -Format "HH:mm" 
@@ -54,7 +50,16 @@ function fnLocal_Main($computerList){
         fnLocal_RunADStoredProc($ADComputersProperties)       
     }
     
-    # return $HardwareProperties | get-member
+    <#if not null use computer from the list provided
+    if null then stored proc to get computer list#>
+    if( $null -ne $computerList){
+        $ADComputers = fnAD_GetManualComputerDetails($computerList)
+        fnLocal_ComputersToScan($ADComputers)
+    } else {
+        $randomComputers =  fnSp_GetRandomComputersUsingStoredProc
+        fnLocal_ComputersToScan($randomComputers)
+    }
+    
 }
 
 
@@ -62,7 +67,7 @@ function fnLocal_Main($computerList){
 $computerList = $null
 
 
-$computerList = "comp1,comp2,server1,server2"
+# $computerList = "comp1,comp2,server1,server2"
 
 
 
