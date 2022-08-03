@@ -60,8 +60,13 @@ function fnLocal_GetLocalComputerDetails($pComputer){
         $os_class = Get-WmiObject -ClassName win32_operatingsystem -ComputerName $localCompName | Select-Object LastBootUpTime, EncryptionLevel, NumberOfUsers,OSArchitecture
         $disk_class = Get-WmiObject -ClassName Win32_DiskDrive -ComputerName $localCompName | select-object Model, @{Name = "HDD_Size_GB"; Exp={$_.Size / 1Gb -as [int]}}
         $physicalDisk_class = Get-WmiObject -ClassName MSFT_PhysicalDisk -ComputerName $localCompName -Namespace root\Microsoft\Windows\Storage  | Select-Object MediaType
-        
+        $tpm_class = Get-WmiObject -ClassName Win32_Tpm -Namespace root\CIMV2\Security\MicrosoftTpm -ComputerName $localCompName -Authentication PacketPrivacy | Select-Object IsEnabled_InitialValue, SpecVersion
         write-host "WMI complete"
+
+        $path = "\\" + $localCompName + "\C$\Windows\System32\"
+        $localspl = $path + "localspl.dll"
+        $spoolsv = $path + "spoolsv.exe"
+        $win32spl =  $path + "win32spl.dll"
 
         $PSCustom_CompDetails = @()
         $PSCustom_CompDetails = [PSCustomObject]@{
@@ -105,6 +110,13 @@ function fnLocal_GetLocalComputerDetails($pComputer){
             Disk_Size_GB = $disk_class.HDD_Size_GB
 
             Disk_Type = fnLocal_GetDiskType($physicalDisk_class.MediaType)
+
+            TpmEnabled = $tpm_class.IsEnabled_InitialValue
+            TpmVersion = $tpm_class.SpecVersion
+
+            LocalSpl_Date = (get-item $localspl | Select-Object LastWriteTime).LastWriteTime  
+            SpoolSv_Date = (get-item $spoolsv | Select-Object LastWriteTime).LastWriteTime
+            Win32Spl_Date = (get-item $win32spl | Select-Object LastWriteTime).LastWriteTime
         } 
     } else {
         write-host "ping failed"
