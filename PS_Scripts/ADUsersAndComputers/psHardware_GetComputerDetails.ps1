@@ -32,6 +32,16 @@ function fnLocal_WakupTpye($pWakeupCode){
         }
     return $wake
 }
+function fnLocal_GetDiskType($pDiskType){
+    $disk = ''
+        switch($pDiskType){
+            3 {$disk = 'HDD'}
+            4 {$disk = 'SDD'}
+            5 {$disk = 'SCM'}
+            Default {$disk = $DiskType}
+        }
+    return $disk
+}
 function fnLocal_GetLocalComputerDetails($pComputer){
     $localCompName = $pComputer.Name
     $lComputerSMA = $pComputer.sAMAccountName
@@ -47,6 +57,10 @@ function fnLocal_GetLocalComputerDetails($pComputer){
         $bios_class = Get-WmiObject -class win32_bios -ComputerName $localCompName | Select-Object SerialNumber, SMBIOSBIOSVersion
         $computerSystem_class = Get-WmiObject -class win32_computersystem -ComputerName $localCompName | Select-Object Manufacturer, Model, TotalPhysicalMemory,UserName,WakeUpType
         $processor_class = Get-WmiObject -class win32_processor -ComputerName $localCompName | Select-Object Name
+        $os_class = Get-WmiObject -ClassName win32_operatingsystem -ComputerName $localCompName | Select-Object LastBootUpTime, EncryptionLevel, NumberOfUsers,OSArchitecture
+        $disk_class = Get-WmiObject -ClassName Win32_DiskDrive -ComputerName $localCompName | select-object Model, @{Name = "HDD_Size_GB"; Exp={$_.Size / 1Gb -as [int]}}
+        $physicalDisk_class = Get-WmiObject -ClassName MSFT_PhysicalDisk -ComputerName $localCompName -Namespace root\Microsoft\Windows\Storage  | Select-Object MediaType
+        
         write-host "WMI complete"
 
         $PSCustom_CompDetails = @()
@@ -81,6 +95,16 @@ function fnLocal_GetLocalComputerDetails($pComputer){
             WakeUpType = fnLocal_WakupTpye($computerSystem_class.WakeUpType)
             
             Processor = $processor_class.Name
+
+            LastReboot  = [Management.ManagementDateTimeConverter]::ToDateTime($os_class.LastBootUpTime)
+            EncryptionLevel = $os_class.EncryptionLevel
+            NumberOfUsers = $os_class.NumberOfUsers
+            OSArchitecture = $os_class.OSArchitecture
+
+            Disk_Model = $disk_class.Model
+            Disk_Size_GB = $disk_class.HDD_Size_GB
+
+            Disk_Type = fnLocal_GetDiskType($physicalDisk_class.MediaType)
         } 
     } else {
         write-host "ping failed"
