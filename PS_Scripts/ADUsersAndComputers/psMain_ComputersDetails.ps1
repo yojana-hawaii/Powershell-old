@@ -10,17 +10,14 @@ function fnLocal_RunADStoredProc($pADComputerProperties){
      foreach($comp in $ADComputersProperties){
             fnSp_InsertAdComputers($comp)
         }
-    
         fnSp_CleanUpAdComputers
-        #run script to move computer name to local computer data table
 }
 
 function fnLocal_RunHardwareStoredProc($pHardwareProperties){
     foreach($comp in $pHardwareProperties){
         fnLocal_InsertHardwareDetails($comp)
-       }
-   
-       #run script to move computer name to local computer data table
+    }
+       fnSp_CleanUpHardwareDetails
 }
 function fnLocal_Main($computerList){
     if( $null -ne $computerList){

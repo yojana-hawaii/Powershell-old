@@ -117,6 +117,38 @@ function fnSp_CleanUpAdComputers{
     write-host "Connection:", $conn.State
     return $sqlResult
 }
+function fnSp_CleanUpHardwareDetails{
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        write-host "Connection:" $conn.State
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spCleanUp_psHardwareDetails"
+
+
+        $cmd.CommandTimeout = 0
+        $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    write-host "Connection:", $conn.State
+    return $sqlResult
+}
 
 function fnLocal_InsertHardwareDetails($pHardwareDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
