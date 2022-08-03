@@ -14,10 +14,19 @@ function fnLocal_RunADStoredProc($pADComputerProperties){
         fnSp_CleanUpAdComputers
         #run script to move computer name to local computer data table
 }
+
+function fnLocal_RunHardwareStoredProc($pHardwareProperties){
+    foreach($comp in $pHardwareProperties){
+        fnLocal_InsertHardwareDetails($comp)
+       }
+   
+       #run script to move computer name to local computer data table
+}
 function fnLocal_Main($computerList){
     if( $null -ne $computerList){
         $ADComputersProperties = fnAD_GetManualComputerDetails($computerList)
         $HardwareProperties = fnHardware_GetManualComputerDetails($ADComputersProperties)
+        fnLocal_RunHardwareStoredProc($HardwareProperties)
     }
     
     <#Run AD part only it is 11pm#>
@@ -29,7 +38,7 @@ function fnLocal_Main($computerList){
         fnLocal_RunADStoredProc($ADComputersProperties)       
     }
     
-    return $HardwareProperties
+    # return $HardwareProperties | get-member
 }
 
 
@@ -38,7 +47,7 @@ $computerList = $null
 
 
 $computerList = "comp1,comp2,server1,server2"
-
+$computerList = "ayush-vm"
 
 fnLocal_Main($computerList)
 
