@@ -22,6 +22,16 @@ function fnLocal_isLaptop($ComputerName){
     
     return $isLaptop
 }
+function fnLocal_WakupTpye($pWakeupCode){
+    $wake = ''
+        switch($pWakeupCode){
+            6 {$wake = 'Power Switch'; break} 
+            5 {$wake = 'LAN Remote'; break} 
+            Default {$wake = $pWakeupCode} 
+
+        }
+    return $wake
+}
 function fnLocal_GetLocalComputerDetails($pComputer){
     $localCompName = $pComputer.Name
     $lComputerSMA = $pComputer.sAMAccountName
@@ -36,12 +46,15 @@ function fnLocal_GetLocalComputerDetails($pComputer){
 
         $bios_class = Get-WmiObject -class win32_bios -ComputerName $localCompName | Select-Object SerialNumber, SMBIOSBIOSVersion
         $computerSystem_class = Get-WmiObject -class win32_computersystem -ComputerName $localCompName | Select-Object Manufacturer, Model, TotalPhysicalMemory,UserName,WakeUpType
-        
+        $processor_class = Get-WmiObject -class win32_processor -ComputerName $localCompName | Select-Object Name
+        write-host "WMI complete"
 
         $PSCustom_CompDetails = @()
         $PSCustom_CompDetails = [PSCustomObject]@{
             Name = $localCompName
             sAMAccountName = $lComputerSMA
+
+            Offline = 0
 
             Last_Security_KB = $securityPatch.HotFixID
             Last_SecurityPatch_date = $securityPatch.InstalledOn
@@ -64,8 +77,19 @@ function fnLocal_GetLocalComputerDetails($pComputer){
             Model = $computerSystem_class.Model
             RAM_GB = [MATH]::Round( ($computerSystem_class.TotalPhysicalMemory / 1Gb), 2 )
             VM = if ($computerSystem_class.Model -like 'virtual*') {1} else {0}
+            CurrentUser = $computerSystem_class.UserName
+            WakeUpType = fnLocal_WakupTpye($computerSystem_class.WakeUpType)
             
+            Processor = $processor_class.Name
         } 
+    } else {
+        write-host "ping failed"
+        $PSCustom_CompDetails = [PSCustomObject]@{
+            Name = $localCompName
+            sAMAccountName = $lComputerSMA
+
+            Offline = 1
+        }
     }
 
     
