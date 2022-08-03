@@ -26,11 +26,9 @@ function fnLocal_Main($computerList){
         if( $null -eq $computerList){
             $ADComputersProperties = fnAD_GetADComputerDetails
         }
-        fnLocal_RunADStoredProc($ADComputersProperties)
-    
-       
+        fnLocal_RunADStoredProc($ADComputersProperties)       
     }
-
+    
     return $HardwareProperties
 }
 
@@ -39,7 +37,8 @@ function fnLocal_Main($computerList){
 $computerList = $null
 
 
-$computerList = "ayush-vm,aashish-21"
+$computerList = "comp1,comp2,server1,server2"
+
 
 fnLocal_Main($computerList)
 

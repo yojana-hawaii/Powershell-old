@@ -54,9 +54,9 @@ function fnLocal_GetLocalComputerDetails($pComputer){
         $AnyPatch = Get-HotFix  -ComputerName $localCompName | Sort-Object InstalledOn -Descending | Select-Object -First 1 
         write-host "patch complete"
 
-        $bios_class = Get-WmiObject -class win32_bios -ComputerName $localCompName | Select-Object SerialNumber, SMBIOSBIOSVersion
-        $computerSystem_class = Get-WmiObject -class win32_computersystem -ComputerName $localCompName | Select-Object Manufacturer, Model, TotalPhysicalMemory,UserName,WakeUpType
-        $processor_class = Get-WmiObject -class win32_processor -ComputerName $localCompName | Select-Object Name
+        $bios_class = Get-WmiObject -ClassName win32_bios -ComputerName $localCompName | Select-Object SerialNumber, SMBIOSBIOSVersion, ReleaseDate
+        $computerSystem_class = Get-WmiObject -ClassName win32_computersystem -ComputerName $localCompName | Select-Object Manufacturer, Model, TotalPhysicalMemory,UserName,WakeUpType
+        $processor_class = Get-WmiObject -ClassName win32_processor -ComputerName $localCompName | Select-Object Name
         $os_class = Get-WmiObject -ClassName win32_operatingsystem -ComputerName $localCompName | Select-Object LastBootUpTime, EncryptionLevel, NumberOfUsers,OSArchitecture
         $disk_class = Get-WmiObject -ClassName Win32_DiskDrive -ComputerName $localCompName | select-object Model, @{Name = "HDD_Size_GB"; Exp={$_.Size / 1Gb -as [int]}}
         $physicalDisk_class = Get-WmiObject -ClassName MSFT_PhysicalDisk -ComputerName $localCompName -Namespace root\Microsoft\Windows\Storage  | Select-Object MediaType
@@ -91,6 +91,7 @@ function fnLocal_GetLocalComputerDetails($pComputer){
 
             SerialNumber = $bios_class.SerialNumber
             BiosVersion = $bios_class.SMBIOSBIOSVersion
+            BiosReleaseDate  = [Management.ManagementDateTimeConverter]::ToDateTime($bios_class.ReleaseDate)
 
             Manufacturer = $computerSystem_class.Manufacturer
             Model = $computerSystem_class.Model
