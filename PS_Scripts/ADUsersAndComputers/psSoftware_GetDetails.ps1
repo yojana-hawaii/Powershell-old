@@ -30,77 +30,68 @@ function fnLocal_StartRemotetegistryService($pComputerName){
 
     return $serviceStatus
 }
-function fnLocal_GetSoftwareDetailsRegistry($pComputer){
+function fnLSoftware_GetLocalDetailsRegistry($pComputer){
     $ComputerName = $pComputer.Name
     $ComputerSMA = $pComputer.sAMAccountName
-    write-host "software for" $ComputerName
-    $CurrentServiceStatus = fnLocal_StopRemotetegistryService($ComputerName)
-    write-host $ComputerName "Start Remote Registry Service" $CurrentServiceStatus.Status $CurrentServiceStatus.StartType
 
-    $CurrentServiceStatus = fnLocal_StartRemotetegistryService($ComputerName)
-    write-host $ComputerName "Update Remote Registry Service" $CurrentServiceStatus.Status $CurrentServiceStatus.StartType
+    $ping = Test-Connection $ComputerName -Quiet -Count 1
+    if($ping) {
+        write-host "software for" $ComputerName
+        $CurrentServiceStatus = fnLocal_StopRemotetegistryService($ComputerName)
+        write-host $ComputerName "Start Remote Registry Service" $CurrentServiceStatus.Status $CurrentServiceStatus.StartType
 
-    $PSCustom_CompDetails = @()
-    
+        $CurrentServiceStatus = fnLocal_StartRemotetegistryService($ComputerName)
+        write-host $ComputerName "Update Remote Registry Service" $CurrentServiceStatus.Status $CurrentServiceStatus.StartType
 
-    if($CurrentServiceStatus.Status -eq "Running"){
-
-        $regLocation = "Software\Microsoft\Windows\CurrentVersion\Uninstall\", 'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\'
-
-        $regType = [Microsoft.Win32.RegistryHive]::LocalMachine
-        $regBase = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($regType ,$ComputerName)
+        $PSCustom_CompDetails = @()
         
-        foreach ($loc in $regLocation){
-            if($regBase){
-                $CurrentRegKey  = $regBase.OpenSubKey($loc )
-                $ProgramKey = $CurrentRegKey.GetSubKeyNames() 
 
-                foreach($key in $ProgramKey){
-                    $programs = $regBase.OpenSubKey($loc+$key )
-                    $SoftwareName = $programs.GetValue('DisplayName')
-                    if($SoftWareName -like "Service Pack*" -or $SoftWareName -like "*Update*"){
-                        continue
-                    }else {
-                        $softwareVersion = $programs.GetValue('DisplayVersion')
-                        $SoftwareVendor = $programs.GetValue('Publisher')
-                        $SoftwareInstallation = $programs.GetValue('InstallDate')
-                        
-                        write-host $SoftwareName $softwareVersion $SoftwareVendor $SoftwareInstallation
-                        $PSCustom_CompDetails += [PSCustomObject]@{
-                            Name = $ComputerName
-                            sAMAccountName = $ComputerSMA
-                            SoftwareName = $SoftwareName 
-                            softwareVersion = $softwareVersion
-                            SoftwareVendor = $SoftwareVendor
-                            SoftwareInstallation = $SoftwareInstallation
+        if($CurrentServiceStatus.Status -eq "Running"){
+
+            $regLocation = "Software\Microsoft\Windows\CurrentVersion\Uninstall\", 'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\'
+
+            $regType = [Microsoft.Win32.RegistryHive]::LocalMachine
+            $regBase = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($regType ,$ComputerName)
+            
+            foreach ($loc in $regLocation){
+                if($regBase){
+                    $CurrentRegKey  = $regBase.OpenSubKey($loc )
+                    $ProgramKey = $CurrentRegKey.GetSubKeyNames() 
+
+                    foreach($key in $ProgramKey){
+                        $programs = $regBase.OpenSubKey($loc+$key )
+                        $SoftwareName = $programs.GetValue('DisplayName')
+                        if($SoftWareName -like "Service Pack*" -or $SoftWareName -like "*Update*"){
+                            continue
+                        }else {
+                            $softwareVersion = $programs.GetValue('DisplayVersion')
+                            $SoftwareVendor = $programs.GetValue('Publisher')
+                            $SoftwareInstallation = $programs.GetValue('InstallDate')
+                            
+                            write-host $SoftwareName $softwareVersion $SoftwareVendor $SoftwareInstallation
+                            $PSCustom_CompDetails += [PSCustomObject]@{
+                                Name = $ComputerName
+                                sAMAccountName = $ComputerSMA
+                                SoftwareName = $SoftwareName 
+                                softwareVersion = $softwareVersion
+                                SoftwareVendor = $SoftwareVendor
+                                SoftwareInstallation = $SoftwareInstallation
+                            }
                         }
-                    }
 
+                    }
                 }
             }
+            
+
         }
-        
 
+
+        $CurrentServiceStatus = fnLocal_StopRemotetegistryService($ComputerName)
+        write-host $ComputerName "Final emote Registry Service" $CurrentServiceStatus.Status $CurrentServiceStatus.StartType
+    
     }
-
-
-    $CurrentServiceStatus = fnLocal_StopRemotetegistryService($ComputerName)
-    write-host $ComputerName "Final emote Registry Service" $CurrentServiceStatus.Status $CurrentServiceStatus.StartType
-    
-    
     return $PSCustom_CompDetails | Where-Object SoftwareName -ne $null
 
 }
 
-function fnSoftware_GetManualComputerDetails($pComputerList){
-    
-    $pComputerList
-    $total = $pComputerList.Count
-    $counter = 1
-    foreach($comp in $pComputerList){
-        write-host "Working on ", $comp.Name, "...", $counter, "of", $total
-        $hdDetails = fnLocal_GetSoftwareDetailsRegistry($comp)
-        $counter++
-    }
-    return $hdDetails
-}

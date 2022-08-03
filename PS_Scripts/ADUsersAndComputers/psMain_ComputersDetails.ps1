@@ -19,7 +19,6 @@ function fnLocal_RunHardwareStoredProc($pHardwareProperties){
     }
        fnSp_CleanUpHardwareDetails
 }
-
 function fnLocal_RunSoftwareStoredProc($pSoftwareProperties){
     foreach($comp in $pSoftwareProperties){
         fnSp_InsertSoftwareProc($comp)
@@ -28,13 +27,22 @@ function fnLocal_RunSoftwareStoredProc($pSoftwareProperties){
 }
 function fnLocal_Main($computerList){
     if( $null -ne $computerList){
-        $ADComputersProperties = fnAD_GetManualComputerDetails($computerList)
+        $ADComputers = fnAD_GetManualComputerDetails($computerList)
 
-        $HardwareProperties = fnHardware_GetManualComputerDetails($ADComputersProperties)
-        fnLocal_RunHardwareStoredProc($HardwareProperties)
+        $total = $ADComputers.Count
+        $counter = 1
 
-        $SoftwareProperties = fnSoftware_GetManualComputerDetails($ADComputersProperties)
-        fnLocal_RunSoftwareStoredProc($SoftwareProperties)
+        foreach($comp in $ADComputers){
+            write-host "Working on ", $comp.Name, "...", $counter, "of", $total
+            $HardwareProperties = fnHardware_GetLocalComputerDetails($comp)
+            fnLocal_RunHardwareStoredProc($HardwareProperties)
+            $SoftwareProperties = fnLSoftware_GetLocalDetailsRegistry($comp)
+            fnLocal_RunSoftwareStoredProc($SoftwareProperties)
+
+            $counter++
+        }
+    
+
     }
     
     <#Run AD part only it is 11pm#>
@@ -55,6 +63,7 @@ $computerList = $null
 
 
 $computerList = "comp1,comp2,server1,server2"
+
 
 
 fnLocal_Main($computerList)

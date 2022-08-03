@@ -42,7 +42,7 @@ function fnLocal_GetDiskType($pDiskType){
         }
     return $disk
 }
-function fnLocal_GetLocalComputerDetails($pComputer){
+function fnHardware_GetLocalComputerDetails($pComputer){
     $localCompName = $pComputer.Name
     $lComputerSMA = $pComputer.sAMAccountName
    
@@ -131,16 +131,4 @@ function fnLocal_GetLocalComputerDetails($pComputer){
 
     
     return $PSCustom_CompDetails
-}
-function fnHardware_GetManualComputerDetails($pComputerList){
-    
-    $pComputerList
-    $total = $pComputerList.Count
-    $counter = 1
-    foreach($comp in $pComputerList){
-        write-host "Working on ", $comp.Name, "...", $counter, "of", $total
-        $hdDetails = fnLocal_GetLocalComputerDetails($comp)
-        $counter++
-    }
-    return $hdDetails
 }
