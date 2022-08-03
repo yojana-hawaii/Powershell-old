@@ -1,4 +1,13 @@
-
+function fnLocal_GetServiceStatus{
+    param($pComputerName, $pServiceName)
+    try {
+        $service = (Get-Service -ComputerName $pComputerName -Name $pServiceName  -ErrorAction Stop).Status
+    } catch {
+        $service = "missing"
+        write-host $pComputerName "missing" $pServiceName
+    }
+    return $service
+}
 function fnLocal_GetLocalComputerDetails($pComputer){
     $localCompName = $pComputer.Name
     $lComputerSMA = $pComputer.sAMAccountName
@@ -10,6 +19,14 @@ function fnLocal_GetLocalComputerDetails($pComputer){
         $securityPatch = Get-HotFix -Description Security* -ComputerName $localCompName | Sort-Object InstalledOn -Descending | Select-Object -First 1 
         $AnyPatch = Get-HotFix  -ComputerName $localCompName | Sort-Object InstalledOn -Descending | Select-Object -First 1 
         write-host "patch complete"
+
+        $print_service = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "Spooler"
+        $kace_service = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "konea"
+        $sysaid_service = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "SysAidAgent"
+        $sentinel_service = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "SentinelAgent"
+        $dellEncryption_service = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "DellMgmtAgent"
+        $cylance_service = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "CylanceSvc"
+        write-host "service complete"
     }
 
     $PSCustom_CompDetails = @()
@@ -21,6 +38,13 @@ function fnLocal_GetLocalComputerDetails($pComputer){
         Last_SecurityPatch_date = $securityPatch.InstalledOn
         LastPatchKb = $AnyPatch.HotFixID
         LastPatchDate = $AnyPatch.InstalledOn
+
+        Print_Status = $print_service
+        Kace_status = $kace_service
+        Sentinel_Status = $sentinel_service
+        Sysaid_Status = $sysaid_service
+        DellEncryption_Status = $dellEncryption_service
+        Cylance_Status = $cylance_service
     } 
     return $PSCustom_CompDetails
 }
