@@ -34,6 +34,10 @@ function fnLocal_GetLocalComputerDetails($pComputer){
         $AnyPatch = Get-HotFix  -ComputerName $localCompName | Sort-Object InstalledOn -Descending | Select-Object -First 1 
         write-host "patch complete"
 
+        $bios_class = Get-WmiObject -class win32_bios -ComputerName $localCompName | Select-Object SerialNumber, SMBIOSBIOSVersion
+        $computerSystem_class = Get-WmiObject -class win32_computersystem -ComputerName $localCompName | Select-Object Manufacturer, Model, TotalPhysicalMemory,UserName,WakeUpType
+        
+
         $PSCustom_CompDetails = @()
         $PSCustom_CompDetails = [PSCustomObject]@{
             Name = $localCompName
@@ -52,6 +56,15 @@ function fnLocal_GetLocalComputerDetails($pComputer){
             Cylance_Status = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "CylanceSvc"
 
             IsLaptop = fnLocal_isLaptop($localCompName)
+
+            SerialNumber = $bios_class.SerialNumber
+            BiosVersion = $bios_class.SMBIOSBIOSVersion
+
+            Manufacturer = $computerSystem_class.Manufacturer
+            Model = $computerSystem_class.Model
+            RAM_GB = [MATH]::Round( ($computerSystem_class.TotalPhysicalMemory / 1Gb), 2 )
+            VM = if ($computerSystem_class.Model -like 'virtual*') {1} else {0}
+            
         } 
     }
 
