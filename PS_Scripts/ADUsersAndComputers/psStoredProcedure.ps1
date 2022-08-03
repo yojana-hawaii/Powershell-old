@@ -150,7 +150,7 @@ function fnSp_CleanUpHardwareDetails{
     return $sqlResult
 }
 
-function fnLocal_InsertHardwareDetails($pHardwareDetails){
+function fnSp_InsertHardwareDetails($pHardwareDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
     $ConnString = fnLocal_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
@@ -263,4 +263,54 @@ function fnLocal_InsertHardwareDetails($pHardwareDetails){
     }   
     write-host "Computer Details updated. SQL Connection Status: " $conn.State
     return $sqlResult
+}
+
+function fnSp_InsertSoftwareProc($pSoftwareDetails){
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnLocal_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spInsert_psLocalSoftwares"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Name", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@sAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@SoftwareName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@SoftwareVersion", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@SoftwareVendor", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@SoftwareInstallation", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($pSoftwareDetails.Name)
+        $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($pSoftwareDetails.sAMAccountName)
+
+        $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($pSoftwareDetails.SoftwareName)
+        $cmd.Parameters[3].Value = fnLocal_GetStringFromObject($pSoftwareDetails.SoftwareVersion)
+        $cmd.Parameters[4].Value = fnLocal_GetStringFromObject($pSoftwareDetails.SoftwareVendor)
+        $cmd.Parameters[5].Value = fnLocal_GetStringFromObject($pSoftwareDetails.SoftwareInstallation)
+
+        
+        $cmd.CommandTimeout = 0
+        $rtn = $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $rtn = $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    return $sqlResult
+
 }
