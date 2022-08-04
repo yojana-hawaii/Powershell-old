@@ -68,7 +68,7 @@ function fnAD_GetInactiveComputers($startDay, $endDay){
     $Endate = (Get-Date).AddDays(-($endDay) ) 
     Write-Host $startDay $endDay
     Write-Host $startDate $Endate
-    $inactiveList = Get-ADComputer  -Filter {LastLogonTimeStamp -gt $startDate -and LastLogonTimeStamp -le $Endate -and OperatingSystem -notlike '*server*'} | Select-Object Name, LastLogonTimeStamp, LastLogonDate,DistinguishedName
+    $inactiveList = Get-ADComputer  -Filter {$_.LastLogonTimeStamp -gt $startDate -and $_.LastLogonTimeStamp -le $Endate -and $_.OperatingSystem -notlike '*server*'} | Select-Object Name, LastLogonTimeStamp, LastLogonDate,DistinguishedName
 
     $PSCustom_CompDetails = @()
     foreach ($comp in $inactiveList){
