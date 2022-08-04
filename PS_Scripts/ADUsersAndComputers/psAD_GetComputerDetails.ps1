@@ -61,3 +61,24 @@ function fnAD_GetManualComputerDetails($pComputerList){
 
     return $adProperties
 }
+
+function fnAD_GetInactiveComputers($startDay, $endDay){
+    $now = Get-Date
+    
+    $startDate = (Get-Date).AddDays(-($startDay) ) 
+    $Endate = (Get-Date).AddDays(-($endDay) ) 
+    Write-Host $startDay $endDay
+    Write-Host $startDate $Endate
+    $inactiveList = Get-ADComputer  -Filter {LastLogonTimeStamp -gt $startDate -and LastLogonTimeStamp -le $Endate -and OperatingSystem -notlike '*server*'} | Select-Object Name, LastLogonTimeStamp, LastLogonDate,DistinguishedName
+
+    $PSCustom_CompDetails = @()
+    foreach ($comp in $inactiveList){
+
+        $PSCustom_CompDetails += [PSCustomObject]@{
+            Name = $comp.name
+            DistinguishedName = $comp.DistinguishedName
+        }
+    }
+    write-host "total" $inactiveList.count
+    return $PSCustom_CompDetails
+}

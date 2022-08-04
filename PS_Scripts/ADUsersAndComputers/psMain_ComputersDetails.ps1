@@ -4,6 +4,7 @@
 . "$PSScriptRoot\psHardware_GetComputerDetails.ps1"
 . "$PSScriptRoot\psStoredProcedure.ps1"
 . "$PSScriptRoot\psSoftware_GetDetails.ps1"
+. "$PSScriptRoot\psInactive_DisableAndMoveOU.ps1"
 
 $gStart_time = fnTest_GetCurrentTime
 
@@ -48,6 +49,7 @@ function fnLocal_Main($computerList){
             $ADComputersProperties = fnAD_GetADComputerDetails
         }
         fnLocal_RunADStoredProc($ADComputersProperties)       
+        fnInactive_DisableAndMoveOU
     }
     
     <#if not null use computer from the list provided
