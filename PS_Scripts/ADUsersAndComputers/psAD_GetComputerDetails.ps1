@@ -63,7 +63,6 @@ function fnAD_GetManualComputerDetails($pComputerList){
 }
 
 function fnAD_GetInactiveComputers($startDay, $endDay){
-    $now = Get-Date
     
     $startDate = (Get-Date).AddDays(-($startDay) ) 
     $Endate = (Get-Date).AddDays(-($endDay) ) 

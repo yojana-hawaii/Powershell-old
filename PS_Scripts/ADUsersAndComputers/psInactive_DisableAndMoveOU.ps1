@@ -8,6 +8,11 @@ function fnLocal_MoveOU($inactiveList, $ou){
         Get-ADComputer -Identity $comp.Name | Set-ADObject -ProtectedFromAccidentalDeletion $true
     }
 }
+function fnLocal_DisableComputers($inactiveList){
+    foreach ($comp in $inactiveList) {
+        Get-ADComputer -Identity $comp.Name | Disable-ADAccount -PassThru
+    }
+}
 function fnInactive_DisableAndMoveOU{
 
     $disabledServer = fnConfig_GetInactiveServerOU
@@ -20,14 +25,17 @@ function fnInactive_DisableAndMoveOU{
     write-host $365Plus
     $Inactive365 = fnAD_GetInactiveComputers  -startDay 153982 -endDay  365
     fnLocal_MoveOU -inactiveList $Inactive365 -ou $365Plus
-    
+    fnLocal_DisableComputers($Inactive365)
+
     write-host $180Plus
     $Inactive180 = fnAD_GetInactiveComputers  -startDay 365 -endDay  180
     fnLocal_MoveOU -inactiveList $Inactive180 -ou $180Plus
+    fnLocal_DisableComputers($Inactive180)
     
     write-host $90Plus
     $Inactive90 = fnAD_GetInactiveComputers  -startDay 180 -endDay  90
     fnLocal_MoveOU -inactiveList $Inactive90 -ou $90Plus
+    fnLocal_DisableComputers($Inactive90)
     
     write-host $30Plus
     $Inactive30 = fnAD_GetInactiveComputers  -startDay 90 -endDay  30
