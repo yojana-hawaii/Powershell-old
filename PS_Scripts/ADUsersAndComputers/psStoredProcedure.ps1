@@ -152,7 +152,7 @@ function fnSp_CleanUpHardwareDetails{
 
 function fnSp_InsertHardwareDetails($pHardwareDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnLocal_GetSqlConnectionString
+    $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
     
     try{
@@ -267,7 +267,7 @@ function fnSp_InsertHardwareDetails($pHardwareDetails){
 
 function fnSp_InsertSoftwareProc($pSoftwareDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnLocal_GetSqlConnectionString
+    $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
 
     
@@ -317,7 +317,7 @@ function fnSp_InsertSoftwareProc($pSoftwareDetails){
 
 function fnSp_GetRandomComputersUsingStoredProc{
     $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnLocal_GetSqlConnectionString
+    $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
     
     
