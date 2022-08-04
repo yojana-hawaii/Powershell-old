@@ -36,7 +36,7 @@ function fnLocal_ComputersToScan($pComputeList){
         fnLocal_RunHardwareStoredProc($HardwareProperties)
         $SoftwareProperties = fnLSoftware_GetLocalDetailsRegistry($comp)
         fnLocal_RunSoftwareStoredProc($SoftwareProperties)
-
+        fnInactive_ManualDisableAndMove($comp)
         $counter++
     }
 }
@@ -57,6 +57,8 @@ function fnLocal_Main($computerList){
     if( $null -ne $computerList){
         $ADComputers = fnAD_GetManualComputerDetails($computerList)
         fnLocal_ComputersToScan($ADComputers)
+        
+
     } else {
         $randomComputers =  fnSp_GetRandomComputersUsingStoredProc
         fnLocal_ComputersToScan($randomComputers)
@@ -70,6 +72,7 @@ $computerList = $null
 
 
 # $computerList = "comp1,comp2,server1,server2"
+$computerList = "710-1tab-21"
 
 
 
