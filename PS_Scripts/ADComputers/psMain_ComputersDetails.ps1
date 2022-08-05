@@ -44,7 +44,7 @@ function fnLocal_Main($computerList){
     
     <#Run AD part only it is 11pm#>
     $time  = Get-Date -Format "HH:mm" 
-    if ($time -like "23*"){
+    if ($time -like "23*" -and (get-date).DayOfWeek -eq "Sunday"){
         if( $null -eq $computerList){
             $ADComputersProperties = fnAD_GetADComputerDetails
         }
