@@ -67,17 +67,30 @@ function fnAD_GetInactiveComputers($startDay, $endDay){
     $startDate = (Get-Date).AddDays(-($startDay) ) 
     $Endate = (Get-Date).AddDays(-($endDay) ) 
     Write-Host $startDay $endDay
-    Write-Host $startDate $Endate
-    $inactiveList = Get-ADComputer  -Filter {$_.LastLogonTimeStamp -gt $startDate -and $_.LastLogonTimeStamp -le $Endate -and $_.OperatingSystem -notlike '*server*'} | Select-Object Name, LastLogonTimeStamp, LastLogonDate,DistinguishedName
-
+    write-host $startDate $Endate
+    $OUs = fnConfig_GetWorkstationOU
+    $remoteOu = fnConfig_GetRemoteOU
+    $outoNetworkOU = fnConfig_GetOutofNetworkOU
     $PSCustom_CompDetails = @()
-    foreach ($comp in $inactiveList){
 
-        $PSCustom_CompDetails += [PSCustomObject]@{
-            Name = $comp.name
-            DistinguishedName = $comp.DistinguishedName
+    foreach($ou in $OUs){
+
+        $inactiveList = Get-ADComputer  `
+                -Filter {LastLogonTimeStamp -gt $startDate -and LastLogonTimeStamp -le $Endate } `
+                -SearchBase $ou | 
+                    Where-Object {$_.DistinguishedName -notlike $outoNetworkOU `
+                                    -and $_.DistinguishedName -notlike $remoteOu } |
+                    Select-Object Name, LastLogonTimeStamp, LastLogonDate,DistinguishedName
+    
+        foreach ($comp in $inactiveList){
+    
+            $PSCustom_CompDetails += [PSCustomObject]@{
+                Name = $comp.name
+                DistinguishedName = $comp.DistinguishedName
+            }
         }
     }
     write-host "total" $inactiveList.count
     return $PSCustom_CompDetails
 }
+# fnAD_GetInactiveComputers -startDay 365 -endDay 14

@@ -32,10 +32,10 @@ function fnConfig_GetInactiveServerOU{
 }
 
 function fnConfig_GetOutofNetworkOU{
-    return "OU=Out Of Network,DC=example,DC=com"
+    return "*OU=Out Of Network,DC=example,DC=com"
 }
 function fnConfig_GetRemoteOU{
-    return "OU=Remote,DC=example,DC=com"
+    return "*OU=Remote,DC=example,DC=com"
 }
 function fnConfig_GetThinClientOU{
     return "OU=Thin Client,DC=example,DC=com"
