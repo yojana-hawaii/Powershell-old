@@ -30,7 +30,7 @@ function fnLocal_StartRemotetegistryService($pComputerName){
 
     return $serviceStatus
 }
-function fnLSoftware_GetLocalDetailsRegistry($pComputer){
+function fnSoftware_GetLocalDetailsRegistry($pComputer){
     $ComputerName = $pComputer.Name
     $ComputerSMA = $pComputer.sAMAccountName
 
