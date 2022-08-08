@@ -3,15 +3,10 @@
 
 function fnLocal_MoveOU($inactiveList, $ou){
     foreach ($comp in $inactiveList) {
-        $outofnetworkou = fnConfig_GetOutofNetworkOU
-        $remoteOu = fnConfig_GetRemoteOU
-        $thinClientOU = fnConfig_GetThinClientOU
-        if ($comp.DistinguishedName -notlike "*$outofnetworkou" -and $comp.DistinguishedName -notlike "*$remoteOu" -and $comp.DistinguishedName -notlike "*$thinClientOU"){
-            write-host $comp.name $comp.DistinguishedName
-            Get-ADComputer -Identity $comp.Name | Set-ADObject -ProtectedFromAccidentalDeletion $false
-            Get-ADComputer -Identity $comp.Name | Move-ADObject -TargetPath $ou
-            Get-ADComputer -Identity $comp.Name | Set-ADObject -ProtectedFromAccidentalDeletion $true
-        }
+        Write-Host $comp.name $comp.DistinguishedName
+        Get-ADComputer -Identity $comp.Name | Set-ADObject -ProtectedFromAccidentalDeletion $false
+        Get-ADComputer -Identity $comp.Name | Move-ADObject -TargetPath $ou
+        Get-ADComputer -Identity $comp.Name | Set-ADObject -ProtectedFromAccidentalDeletion $true
     }
 }
 function fnLocal_DisableComputers($inactiveList){
@@ -60,3 +55,5 @@ function fnInactive_ManualDisableAndMove($pComputer){
     $90Plus = fnConfig_GetInactive90PlusOU
     $30Plus = fnConfig_GetInactive30PlusOU
     $14Plus = fnConfig_GetInactive14PlusOU
+
+    # fnInactive_DisableAndMoveOU
