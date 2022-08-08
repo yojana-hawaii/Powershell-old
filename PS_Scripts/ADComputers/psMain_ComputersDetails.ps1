@@ -5,6 +5,7 @@
 . "$PSScriptRoot\psStoredProcedure.ps1"
 . "$PSScriptRoot\psSoftware_GetDetails.ps1"
 . "$PSScriptRoot\psInactive_DisableAndMoveOU.ps1"
+. "$PSScriptRoot\psPrinter_GetDetails.ps1"
 
 $gStart_time = fnTest_GetCurrentTime
 
@@ -34,9 +35,10 @@ function fnLocal_ComputersToScan($pComputeList){
         write-host "Working on ", $comp.Name, "...", $counter, "of", $total
         $HardwareProperties = fnHardware_GetLocalComputerDetails($comp)
         fnLocal_RunHardwareStoredProc($HardwareProperties)
-        $SoftwareProperties = fnLSoftware_GetLocalDetailsRegistry($comp)
+        $SoftwareProperties = fnSoftware_GetLocalDetailsRegistry($comp)
         fnLocal_RunSoftwareStoredProc($SoftwareProperties)
-        fnInactive_ManualDisableAndMove($comp)
+        
+        # fnPrinter_GetDetails($comp)
         $counter++
     }
 }
@@ -57,26 +59,12 @@ function fnLocal_Main($computerList){
     if( $null -ne $computerList){
         $ADComputers = fnAD_GetManualComputerDetails($computerList)
         fnLocal_ComputersToScan($ADComputers)
-        
-
     } else {
         $randomComputers =  fnSp_GetRandomComputersUsingStoredProc
         fnLocal_ComputersToScan($randomComputers)
     }
     
 }
-
-
-
-$computerList = $null
-
-
-# $computerList = "comp1,comp2,server1,server2"
-$computerList = "710-1tab-21"
-
-
-
-fnLocal_Main($computerList)
 
 $gEnd_time = fnTest_GetCurrentTime
 $gDuration = $gEnd_time - $gStart_time
