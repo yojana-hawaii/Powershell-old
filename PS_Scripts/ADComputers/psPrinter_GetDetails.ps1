@@ -71,32 +71,35 @@ function fnPrinter_GetSharedPrinterRegistry($pComputer){
 #locally installed
 function fnPrinter_GetDetails($pComputer){
     $localCompName = $pComputer.Name
-    # $localCompName = $pComputer
     $lComputerSMA = $pComputer.sAMAccountName
 
+    $ping = Test-Connection $localCompName -Quiet -Count 1
+    if($ping) {
+        write-host "Ping success"
 
-    $drivers = Get-PrinterDriver -ComputerName $localCompName -name * | Select-Object Name, Provider,IsPackageAware, `
-                        @{Name="DriverVersion"; Expression={
-                            $ver = $_.DriverVersion
-                            $rev = $ver -band 0xffff
-                            $build = ($ver -shr 16) -band 0xffff
-                            $minor = ($ver -shr 32) -band 0xffff
-                            $major = ($ver -shr 48) -band 0xffff
-                            "$major.$minor.$build.$rev"
-                        };}
-    Get-WmiObject -Class win32_Printer -ComputerName $localCompName | ForEach-Object {
-        $ThisPrintDriverName = $_.DriverName
-        $ThisDriver = $drivers | Where-Object {  $_.Name -eq $ThisPrintDriverName }
+        $drivers = Get-PrinterDriver -ComputerName $localCompName -name * | Select-Object Name, Provider,IsPackageAware, `
+                            @{Name="DriverVersion"; Expression={
+                                $ver = $_.DriverVersion
+                                $rev = $ver -band 0xffff
+                                $build = ($ver -shr 16) -band 0xffff
+                                $minor = ($ver -shr 32) -band 0xffff
+                                $major = ($ver -shr 48) -band 0xffff
+                                "$major.$minor.$build.$rev"
+                            };}
+        Get-WmiObject -Class win32_Printer -ComputerName $localCompName | ForEach-Object {
+            $ThisPrintDriverName = $_.DriverName
+            $ThisDriver = $drivers | Where-Object {  $_.Name -eq $ThisPrintDriverName }
 
-    $localPrinter = [PSCustomObject]@{
-            sAMAccountName = $lComputerSMA
-            Name = $localCompName
-            PrinterName = $_.Name
-            PrinterShared = $_.Shared
-            PrinterDriverName = $_.DriverName
-            PrinterIP = $_.PortName
-            PrinterDriverVersion = $ThisDriver.DriverVersion
+            $localPrinter = [PSCustomObject]@{
+                    sAMAccountName = $lComputerSMA
+                    Name = $localCompName
+                    PrinterName = $_.Name
+                    PrinterShared = $_.Shared
+                    PrinterDriverName = $_.DriverName
+                    PrinterIP = $_.PortName
+                    PrinterDriverVersion = $ThisDriver.DriverVersion
+                }
+            return $localPrinter
         }
-    return $localPrinter
     }
 }
