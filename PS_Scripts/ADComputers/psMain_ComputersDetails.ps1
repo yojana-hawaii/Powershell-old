@@ -27,6 +27,12 @@ function fnLocal_RunSoftwareStoredProc($pSoftwareProperties){
     }
     #    fnSp_CleanUpSoftwareDetails
 }
+function fnLocal_RunPrinterStoredproc($PrinterProperties){
+    foreach($comp in $PrinterProperties){
+        fnSp_InsertPrinterDetails($comp)
+    }
+    #    fnSp_CleanUpPrinterDetails
+}
 function fnLocal_ComputersToScan($pComputeList){
     $total = $pComputeList.Count
     $counter = 1
@@ -38,7 +44,8 @@ function fnLocal_ComputersToScan($pComputeList){
         $SoftwareProperties = fnSoftware_GetLocalDetailsRegistry($comp)
         fnLocal_RunSoftwareStoredProc($SoftwareProperties)
         
-        # fnPrinter_GetDetails($comp)
+        $PrinterProperties = fnPrinter_GetDetails($comp)
+        fnLocal_RunPrinterStoredproc($PrinterProperties)
         $counter++
     }
 }

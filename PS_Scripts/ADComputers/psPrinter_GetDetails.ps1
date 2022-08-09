@@ -1,5 +1,5 @@
 . "$PSScriptRoot\psSoftware_GetDetails.ps1"
-# $comp = "ayush-vm"
+
 #shared printers - similar to software list from reg
 # HKEY_USER\profilename\Printers\Connections\
 
@@ -89,15 +89,14 @@ function fnPrinter_GetDetails($pComputer){
         $ThisDriver = $drivers | Where-Object {  $_.Name -eq $ThisPrintDriverName }
 
     $localPrinter = [PSCustomObject]@{
-                Name = $_.Name
-                Shared = $_.Shared
-                Local = $_.Local
-                DriverName = $_.DriverName
-                PortName = $_.PortName
-                Version = $ThisDriver.DriverVersion
-            }
+            sAMAccountName = $lComputerSMA
+            Name = $localCompName
+            PrinterName = $_.Name
+            PrinterShared = $_.Shared
+            PrinterDriverName = $_.DriverName
+            PrinterIP = $_.PortName
+            PrinterDriverVersion = $ThisDriver.DriverVersion
+        }
     return $localPrinter
     }
 }
-# $localCompName = "ayush-vm"
-# fnPrinter_GetDetails($localCompName)

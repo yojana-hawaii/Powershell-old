@@ -296,12 +296,12 @@ function fnSp_InsertSoftwareProc($pSoftwareDetails){
 
         
         $cmd.CommandTimeout = 0
-        $rtn = $cmd.ExecuteNonQuery()
+        $cmd.ExecuteNonQuery()
         
         $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
         $sqlAdapter.SelectCommand = $cmd
         $DataSet =  New-Object System.Data.DataSet
-        $rtn = $sqlAdapter.Fill($DataSet)
+        $sqlAdapter.Fill($DataSet)
         $sqlResult = $DataSet.Tables[0]   
     }catch{
         write-host "failed"
@@ -346,5 +346,57 @@ function fnSp_GetRandomComputersUsingStoredProc{
     }   
     write-host "Connection:", $conn.State
     return $data
+
+}
+
+function fnSp_InsertPrinterDetails($printerDetails){
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spInsert_psLocalPrinters"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Name", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@sAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@PrinterName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@PrinterIP", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@PrinterShared", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@PrinterDriverName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@PrinterDriverVersion", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($printerDetails.Name)
+        $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($printerDetails.sAMAccountName)
+
+        $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($printerDetails.Printername)
+        $cmd.Parameters[3].Value = fnLocal_GetStringFromObject($printerDetails.PrinterIP)
+        $cmd.Parameters[4].Value = fnLocal_GetStringFromObject($printerDetails.PrinterShared)
+        $cmd.Parameters[5].Value = fnLocal_GetStringFromObject($printerDetails.PrinterDriverName)
+        $cmd.Parameters[6].Value = fnLocal_GetStringFromObject($printerDetails.PrinterDriverVersion)
+
+        
+        $cmd.CommandTimeout = 0
+        $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    return $sqlResult
 
 }
