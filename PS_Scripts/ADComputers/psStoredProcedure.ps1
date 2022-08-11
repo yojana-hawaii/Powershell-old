@@ -400,3 +400,56 @@ function fnSp_InsertPrinterDetails($printerDetails){
     return $sqlResult
 
 }
+
+function fnLocal_RunMonitorStoredproc($monitorDetails){
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spInsert_psLocalMonitor"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Name", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@sAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@MonitorManufacturer", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@MonitorName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@MonitorSerial", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@MonitorYear", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@MonitorCaption", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@MonitorResolution", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($monitorDetails.Name)
+        $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($monitorDetails.sAMAccountName)
+
+        $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorManufacturer)
+        $cmd.Parameters[3].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorName)
+        $cmd.Parameters[4].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorSerial)
+        $cmd.Parameters[5].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorYear)
+        $cmd.Parameters[6].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorCaption)
+        $cmd.Parameters[7].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorResolution)
+
+        
+        $cmd.CommandTimeout = 0
+        $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    return $sqlResult
+}

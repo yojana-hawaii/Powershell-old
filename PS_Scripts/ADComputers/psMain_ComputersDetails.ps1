@@ -6,6 +6,7 @@
 . "$PSScriptRoot\psSoftware_GetDetails.ps1"
 . "$PSScriptRoot\psInactive_DisableAndMoveOU.ps1"
 . "$PSScriptRoot\psPrinter_GetDetails.ps1"
+. "$PSScriptRoot\psMonitor_GetDetails.ps1"
 
 $gStart_time = fnTest_GetCurrentTime
 
@@ -46,6 +47,8 @@ function fnLocal_ComputersToScan($pComputeList){
         
         $PrinterProperties = fnPrinter_GetDetails($comp)
         fnLocal_RunPrinterStoredproc($PrinterProperties)
+
+        fnMonitor_GetMonitorDetails($comp)
         $counter++
     }
 }
