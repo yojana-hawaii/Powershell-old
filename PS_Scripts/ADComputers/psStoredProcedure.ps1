@@ -85,7 +85,7 @@ function fnSp_InsertAdComputers($pADDetails){
     return $sqlResult
 }
 
-function fnSp_CleanUpAdComputers{
+function fnSp_CleanUpTables{
     $conn = New-Object System.Data.SqlClient.SqlConnection
     $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
@@ -95,7 +95,7 @@ function fnSp_CleanUpAdComputers{
         $cmd = $conn.CreateCommand()
         write-host "Connection:" $conn.State
         $cmd.CommandType = 'StoredProcedure'
-        $cmd.CommandText = "dbo.spCleanUp_psADComputer"
+        $cmd.CommandText = "dbo.spCleanUp_psTables"
 
 
         $cmd.CommandTimeout = 0
@@ -117,39 +117,6 @@ function fnSp_CleanUpAdComputers{
     write-host "Connection:", $conn.State
     return $sqlResult
 }
-function fnSp_CleanUpHardwareDetails{
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-    
-    try{
-        $conn.Open()
-        $cmd = $conn.CreateCommand()
-        write-host "Connection:" $conn.State
-        $cmd.CommandType = 'StoredProcedure'
-        $cmd.CommandText = "dbo.spCleanUp_psHardwareDetails"
-
-
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
-    }catch{
-        write-host "failed"
-        Write-Host $Error[0].Exception.Message
-    }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
-    }   
-    write-host "Connection:", $conn.State
-    return $sqlResult
-}
-
 function fnSp_InsertHardwareDetails($pHardwareDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
     $ConnString = fnConfig_GetSqlConnectionString
@@ -434,6 +401,50 @@ function fnLocal_RunMonitorStoredproc($monitorDetails){
         $cmd.Parameters[6].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorCaption)
         $cmd.Parameters[7].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorResolution)
 
+        
+        $cmd.CommandTimeout = 0
+        $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    return $sqlResult
+}
+
+function fnLocal_RunUsersStoredproc($userDetails){
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spInsert_psLocalUsers"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Name", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@sAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@UsersLoggedIn", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@UserLastLoginDate", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($userDetails.Name)
+        $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($userDetails.sAMAccountName)
+
+        $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($userDetails.UsersLoggedIn)
+        $cmd.Parameters[3].Value = fnLocal_GetStringFromObject($userDetails.UserLastLoginDate)
         
         $cmd.CommandTimeout = 0
         $cmd.ExecuteNonQuery()
