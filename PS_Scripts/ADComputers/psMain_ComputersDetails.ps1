@@ -7,6 +7,7 @@
 . "$PSScriptRoot\psInactive_DisableAndMoveOU.ps1"
 . "$PSScriptRoot\psPrinter_GetDetails.ps1"
 . "$PSScriptRoot\psMonitor_GetDetails.ps1"
+. "$PSScriptRoot\psUsers_GetComputerUsers.ps1"
 
 $gStart_time = fnTest_GetCurrentTime
 
@@ -14,25 +15,21 @@ function fnLocal_RunADStoredProc($pADComputerProperties){
      foreach($comp in $ADComputersProperties){
             fnSp_InsertAdComputers($comp)
         }
-        fnSp_CleanUpAdComputers
 }
 function fnLocal_RunHardwareStoredProc($pHardwareProperties){
     foreach($comp in $pHardwareProperties){
         fnSp_InsertHardwareDetails($comp)
     }
-       fnSp_CleanUpHardwareDetails
 }
 function fnLocal_RunSoftwareStoredProc($pSoftwareProperties){
     foreach($comp in $pSoftwareProperties){
         fnSp_InsertSoftwareProc($comp)
     }
-    #    fnSp_CleanUpSoftwareDetails
 }
 function fnLocal_RunPrinterStoredproc($PrinterProperties){
     foreach($comp in $PrinterProperties){
         fnSp_InsertPrinterDetails($comp)
     }
-    #    fnSp_CleanUpPrinterDetails
 }
 function fnLocal_ComputersToScan($pComputeList){
     $total = $pComputeList.Count
@@ -49,6 +46,7 @@ function fnLocal_ComputersToScan($pComputeList){
         fnLocal_RunPrinterStoredproc($PrinterProperties)
 
         fnMonitor_GetMonitorDetails($comp)
+        fnUser_GetUserLoggedOnHistory($comp)
         $counter++
     }
 }
@@ -73,6 +71,8 @@ function fnLocal_Main($computerList){
         $randomComputers =  fnSp_GetRandomComputersUsingStoredProc
         fnLocal_ComputersToScan($randomComputers)
     }
+
+    fnSp_CleanUpTables
     
 }
 
