@@ -64,7 +64,6 @@ function fnMonitor_GetMonitorDetails($pComputer){
                 MonitorResolution = $currentVideo.MonitorResolution
             }
             fnLocal_RunMonitorStoredproc($monitorDetails)
-            return $monitorDetails
         }
     }
 }
