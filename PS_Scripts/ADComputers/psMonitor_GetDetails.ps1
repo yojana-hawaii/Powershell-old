@@ -63,7 +63,7 @@ function fnMonitor_GetMonitorDetails($pComputer){
                 MonitorCaption = $currentVideo.MonitorCaption
                 MonitorResolution = $currentVideo.MonitorResolution
             }
-            fnLocal_RunMonitorStoredproc($monitorDetails)
+            fnSp_InsertMonitorDetails($monitorDetails)
         }
     }
 }

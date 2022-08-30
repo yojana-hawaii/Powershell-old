@@ -10,6 +10,71 @@ function fnLocal_GetStringFromObject($pObjParam){
         return $pObjParam.ToString();
     }
 }
+function fnSp_CleanUpTables{
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        write-host "Connection:" $conn.State
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spCleanUp_psTables"
+
+
+        $cmd.CommandTimeout = 0
+        $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    write-host "Connection:", $conn.State
+    return $sqlResult
+}
+function fnSp_GetRandomComputersUsingStoredProc{
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+    
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        write-host "Connection:" $conn.State
+        $cmd.CommandType = 'StoredProcedure'
+
+        $cmd.CommandText = "dbo.spGet_psRandomComputerToScan"
+
+        $cmd.CommandTimeout = 0
+        $result = $cmd.ExecuteReader()
+        
+        $data = New-Object System.Data.DataTable
+        $data.Load($result)
+
+
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    write-host "Connection:", $conn.State
+    return $data
+
+}
 
 function fnSp_InsertAdComputers($pADDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
@@ -63,39 +128,6 @@ function fnSp_InsertAdComputers($pADDetails){
         $cmd.Parameters[16].Value = fnLocal_GetStringFromObject($pADDetails.OperatingSystemVersion)
         $cmd.Parameters[17].Value = fnLocal_GetStringFromObject($pADDetails.sAMAccountName)
 
-
-
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
-    }catch{
-        write-host "failed"
-        Write-Host $Error[0].Exception.Message
-    }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
-    }   
-    write-host "Connection:", $conn.State
-    return $sqlResult
-}
-
-function fnSp_CleanUpTables{
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-    
-    try{
-        $conn.Open()
-        $cmd = $conn.CreateCommand()
-        write-host "Connection:" $conn.State
-        $cmd.CommandType = 'StoredProcedure'
-        $cmd.CommandText = "dbo.spCleanUp_psTables"
 
 
         $cmd.CommandTimeout = 0
@@ -231,8 +263,7 @@ function fnSp_InsertHardwareDetails($pHardwareDetails){
     write-host "Computer Details updated. SQL Connection Status: " $conn.State
     return $sqlResult
 }
-
-function fnSp_InsertSoftwareProc($pSoftwareDetails){
+function fnSp_InsertSoftwareDetails($pSoftwareDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
     $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
@@ -281,41 +312,6 @@ function fnSp_InsertSoftwareProc($pSoftwareDetails){
     return $sqlResult
 
 }
-
-function fnSp_GetRandomComputersUsingStoredProc{
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-    
-    
-    try{
-        $conn.Open()
-        $cmd = $conn.CreateCommand()
-        write-host "Connection:" $conn.State
-        $cmd.CommandType = 'StoredProcedure'
-
-        $cmd.CommandText = "dbo.spGet_psRandomComputerToScan"
-
-        $cmd.CommandTimeout = 0
-        $result = $cmd.ExecuteReader()
-        
-        $data = New-Object System.Data.DataTable
-        $data.Load($result)
-
-
-    }catch{
-        write-host "failed"
-        Write-Host $Error[0].Exception.Message
-    }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
-    }   
-    write-host "Connection:", $conn.State
-    return $data
-
-}
-
 function fnSp_InsertPrinterDetails($printerDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
     $ConnString = fnConfig_GetSqlConnectionString
@@ -368,7 +364,7 @@ function fnSp_InsertPrinterDetails($printerDetails){
 
 }
 
-function fnLocal_RunMonitorStoredproc($monitorDetails){
+function fnSp_InsertMonitorDetails($monitorDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
     $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
@@ -421,7 +417,7 @@ function fnLocal_RunMonitorStoredproc($monitorDetails){
     return $sqlResult
 }
 
-function fnLocal_RunUsersStoredproc($userDetails){
+function fnSp_InsertLocalUserDetails($userDetails){
     $conn = New-Object System.Data.SqlClient.SqlConnection
     $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString

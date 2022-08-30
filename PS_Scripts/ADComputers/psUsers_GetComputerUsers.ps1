@@ -24,7 +24,7 @@ function fnUser_GetUserLoggedOnHistory($pComputer){
                UsersLoggedIn = $u.Name
                UserLastLoginDate = $lastLogon
             }
-            fnLocal_RunUsersStoredproc($usersObject)
+            fnSp_InsertLocalUserDetails($usersObject)
          }
       }
 }

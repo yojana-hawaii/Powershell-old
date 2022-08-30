@@ -24,7 +24,7 @@ function fnLocal_RunHardwareStoredProc($pHardwareProperties){
 }
 function fnLocal_RunSoftwareStoredProc($pSoftwareProperties){
     foreach($comp in $pSoftwareProperties){
-        fnSp_InsertSoftwareProc($comp)
+        fnSp_InsertSoftwareDetails($comp)
     }
 }
 function fnLocal_RunPrinterStoredproc($PrinterProperties){
