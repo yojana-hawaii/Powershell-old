@@ -52,7 +52,7 @@ function fnLocal_ComputersToScan($pComputeList){
 }
 function fnLocal_Main($computerList){
     
-    <#Run AD part only it is 11pm#>
+    <#Run AD Computer part only > Sunday 11pm #>
     $time  = Get-Date -Format "HH:mm" 
     if ($time -like "23*" -and (get-date).DayOfWeek -eq "Sunday"){
         if( $null -eq $computerList){
@@ -60,6 +60,23 @@ function fnLocal_Main($computerList){
         }
         fnLocal_RunADStoredProc($ADComputersProperties)       
         fnInactive_DisableAndMoveOU
+    }
+    <# Run AD Users and Groups and Members 11pm Daily #>
+    if ($time -like "23*" ){
+        $adUsers = fnAD_GetUserDetails
+        foreach($user in $adUsers){
+            fnSp_InsertAdUsers($user)
+        }
+            
+        $adgroups = fnAD_GetGroups
+        foreach($grp in $adgroups){
+            fnSp_InsertAdGroups($grp)
+        }
+
+        $adGroupMembers = fnAd_GetGroupMembers
+        foreach($member in $adGroupMembers){
+            fnSp_InsertAdGroupMembers($member)
+        }
     }
     
     <#if not null use computer from the list provided

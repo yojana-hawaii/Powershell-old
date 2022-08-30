@@ -464,3 +464,197 @@ function fnLocal_RunUsersStoredproc($userDetails){
     }   
     return $sqlResult
 }
+
+
+function fnSp_InsertAdUsers($adUsers){
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spInsert_psAdUsers"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@CanonicalName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@sAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@FirstName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@LastName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@DisplayName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Email", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@DistinguishedName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Address", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@FullNumber", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@SecondaryNumber", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Extension", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Fax", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Company", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Department", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Title", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Description", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@AccountExpires", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Enabled", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@LastLogonDate", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@WhenCreated", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@PasswordNeverExpires", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@PasswordExpired", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@PasswordLastSet", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@LogonScript", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@LogonCount", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@EmployeeId", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Manager", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($adUsers.CanonicalName)
+        $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($adUsers.sAMAccountName)
+        $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($adUsers.GivenName)
+        $cmd.Parameters[3].Value = fnLocal_GetStringFromObject($adUsers.SurName)
+        $cmd.Parameters[4].Value = fnLocal_GetStringFromObject($adUsers.DisplayName)
+
+        $cmd.Parameters[5].Value = fnLocal_GetStringFromObject($adUsers.emailAddress)
+        $cmd.Parameters[6].Value = fnLocal_GetStringFromObject($adUsers.DistinguishedName)
+        $cmd.Parameters[7].Value = fnLocal_GetStringFromObject($adUsers.StreetAddress)
+        $cmd.Parameters[8].Value = fnLocal_GetStringFromObject($adUsers.HomePhone)
+        $cmd.Parameters[9].Value = fnLocal_GetStringFromObject($adUsers.MobilePhone)
+        $cmd.Parameters[10].Value = fnLocal_GetStringFromObject($adUsers.OfficePhone)
+        $cmd.Parameters[11].Value = fnLocal_GetStringFromObject($adUsers.Fax)
+
+        $cmd.Parameters[12].Value = fnLocal_GetStringFromObject($adUsers.Company)
+        $cmd.Parameters[13].Value = fnLocal_GetStringFromObject($adUsers.Department)
+        $cmd.Parameters[14].Value = fnLocal_GetStringFromObject($adUsers.Title)
+        $cmd.Parameters[15].Value = fnLocal_GetStringFromObject($adUsers.Description)
+        $cmd.Parameters[16].Value = fnLocal_GetStringFromObject($adUsers.AccountExpires)
+        $cmd.Parameters[17].Value = fnLocal_GetStringFromObject($adUsers.Enabled)
+        $cmd.Parameters[18].Value = fnLocal_GetStringFromObject($adUsers.LastLogonDate)
+
+        $cmd.Parameters[19].Value = fnLocal_GetStringFromObject($adUsers.WhenCreated)
+        $cmd.Parameters[20].Value = fnLocal_GetStringFromObject($adUsers.PasswordNeverExpires)
+        $cmd.Parameters[21].Value = fnLocal_GetStringFromObject($adUsers.PasswordExpired)
+        $cmd.Parameters[22].Value = fnLocal_GetStringFromObject($adUsers.PasswordLastSet)
+        $cmd.Parameters[23].Value = fnLocal_GetStringFromObject($adUsers.ScriptPath)
+        $cmd.Parameters[24].Value = fnLocal_GetStringFromObject($adUsers.LogonCount)
+        $cmd.Parameters[25].Value = fnLocal_GetStringFromObject($adUsers.EmployeeID)
+        $cmd.Parameters[26].Value = fnLocal_GetStringFromObject($adUsers.Manager)
+
+        
+        
+        $cmd.CommandTimeout = 0
+        $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    return $sqlResult
+}
+
+function fnSp_InsertAdGroups($grp){
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spInsert_psAdGroups"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@CanonicalName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@sAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Name", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@DistinguishedName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Description", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@GroupCategory", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@GroupScope", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@whenCreated", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Email", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($grp.CanonicalName)
+        $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($grp.sAMAccountName)
+        $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($grp.Name)
+        $cmd.Parameters[3].Value = fnLocal_GetStringFromObject($grp.DistinguishedName)
+        $cmd.Parameters[4].Value = fnLocal_GetStringFromObject($grp.Description)
+
+        $cmd.Parameters[5].Value = fnLocal_GetStringFromObject($grp.GroupCategory)
+        $cmd.Parameters[6].Value = fnLocal_GetStringFromObject($grp.GroupScope)
+        $cmd.Parameters[7].Value = fnLocal_GetStringFromObject($grp.whenCreated)
+        $cmd.Parameters[8].Value = fnLocal_GetStringFromObject($grp.mail)
+        
+        
+        $cmd.CommandTimeout = 0
+        $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    return $sqlResult
+}
+
+function fnSp_InsertAdGroupMembers($GroupMember){
+    $conn = New-Object System.Data.SqlClient.SqlConnection
+    $ConnString = fnConfig_GetSqlConnectionString
+    $conn.ConnectionString =  $ConnString
+
+    
+    try{
+        $conn.Open()
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spInsert_psAdGroupMembers"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@GroupsAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@UserName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@ObjectClass", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+      
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($GroupMember.GroupsAMAccountName)
+        $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($GroupMember.sAMAccountName)
+        $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($GroupMember.ObjectClass)
+
+        
+        
+        $cmd.CommandTimeout = 0
+        $cmd.ExecuteNonQuery()
+        
+        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+        $sqlAdapter.SelectCommand = $cmd
+        $DataSet =  New-Object System.Data.DataSet
+        $sqlAdapter.Fill($DataSet)
+        $sqlResult = $DataSet.Tables[0]   
+    }catch{
+        write-host "failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        $conn.Dispose()
+        $cmd.Dispose()
+        $conn.Close()
+    }   
+    return $sqlResult
+}
