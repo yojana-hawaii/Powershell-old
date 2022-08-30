@@ -1,3 +1,8 @@
+
+<########
+How to refactor stored procedure with parameters??
+##############>
+
 . "$PSScriptRoot\psConfig.ps1"
 
 function fnLocal_GetStringFromObject($pObjParam){
@@ -10,50 +15,42 @@ function fnLocal_GetStringFromObject($pObjParam){
         return $pObjParam.ToString();
     }
 }
-function fnSp_CleanUpTables{
+function fnLocal_GetSQLConnection{
     $conn = New-Object System.Data.SqlClient.SqlConnection
     $ConnString = fnConfig_GetSqlConnectionString
     $conn.ConnectionString =  $ConnString
-    
+    $conn.Open()
+    return $conn
+}
+function fnLocal_CloseSqlConnection($conn, $cmd){
+    $conn.Dispose()
+    $cmd.Dispose()
+    $conn.Close()
+}
+
+
+
+function fnSp_CleanUpTables{   
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
-        write-host "Connection:" $conn.State
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spCleanUp_psTables"
 
-
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()    
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
-    write-host "Connection:", $conn.State
     return $sqlResult
 }
 function fnSp_GetRandomComputersUsingStoredProc{
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-    
-    
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
-        write-host "Connection:" $conn.State
         $cmd.CommandType = 'StoredProcedure'
-
         $cmd.CommandText = "dbo.spGet_psRandomComputerToScan"
 
         $cmd.CommandTimeout = 0
@@ -61,30 +58,19 @@ function fnSp_GetRandomComputersUsingStoredProc{
         
         $data = New-Object System.Data.DataTable
         $data.Load($result)
-
-
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
-    write-host "Connection:", $conn.State
     return $data
-
 }
 
 function fnSp_InsertAdComputers($pADDetails){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-    
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
-        write-host "Connection:" $conn.State
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psADComputers"
 
@@ -107,8 +93,6 @@ function fnSp_InsertAdComputers($pADDetails){
         $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@OperatingSystemVersion", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
         $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@sAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
 
-
-
         $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($pADDetails.Name)
         $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($pADDetails.DistinguishedName)
         $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($pADDetails.Created)
@@ -128,36 +112,19 @@ function fnSp_InsertAdComputers($pADDetails){
         $cmd.Parameters[16].Value = fnLocal_GetStringFromObject($pADDetails.OperatingSystemVersion)
         $cmd.Parameters[17].Value = fnLocal_GetStringFromObject($pADDetails.sAMAccountName)
 
-
-
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()    
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
-    write-host "Connection:", $conn.State
     return $sqlResult
 }
 function fnSp_InsertHardwareDetails($pHardwareDetails){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-    
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
-        # write-host "Connection:" $conn.State
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psLocalComputers"
 
@@ -243,34 +210,18 @@ function fnSp_InsertHardwareDetails($pHardwareDetails){
         $cmd.Parameters[34].Value = fnLocal_GetStringFromObject($pHardwareDetails.LastPatchKb)
         $cmd.Parameters[35].Value = fnLocal_GetStringFromObject($pHardwareDetails.LastPatchDate)
 
-         
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()   
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
-    write-host "Computer Details updated. SQL Connection Status: " $conn.State
     return $sqlResult
 }
 function fnSp_InsertSoftwareDetails($pSoftwareDetails){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-
-    
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psLocalSoftwares"
@@ -291,35 +242,20 @@ function fnSp_InsertSoftwareDetails($pSoftwareDetails){
         $cmd.Parameters[3].Value = fnLocal_GetStringFromObject($pSoftwareDetails.SoftwareVersion)
         $cmd.Parameters[4].Value = fnLocal_GetStringFromObject($pSoftwareDetails.SoftwareVendor)
         $cmd.Parameters[5].Value = fnLocal_GetStringFromObject($pSoftwareDetails.SoftwareInstallation)
-
         
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()   
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
     return $sqlResult
 
 }
 function fnSp_InsertPrinterDetails($printerDetails){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-
-    
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psLocalPrinters"
@@ -343,35 +279,20 @@ function fnSp_InsertPrinterDetails($printerDetails){
         $cmd.Parameters[5].Value = fnLocal_GetStringFromObject($printerDetails.PrinterDriverName)
         $cmd.Parameters[6].Value = fnLocal_GetStringFromObject($printerDetails.PrinterDriverVersion)
 
-        
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()   
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
     return $sqlResult
 
 }
 
 function fnSp_InsertMonitorDetails($monitorDetails){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-
-    
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psLocalMonitor"
@@ -397,34 +318,19 @@ function fnSp_InsertMonitorDetails($monitorDetails){
         $cmd.Parameters[6].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorCaption)
         $cmd.Parameters[7].Value = fnLocal_GetStringFromObject($monitorDetails.MonitorResolution)
 
-        
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()   
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
     return $sqlResult
 }
 
-function fnSp_InsertLocalUserDetails($userDetails){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-
-    
+function fnSp_InsertUserLoginHistory($userDetails){
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psLocalUsers"
@@ -442,34 +348,21 @@ function fnSp_InsertLocalUserDetails($userDetails){
         $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($userDetails.UsersLoggedIn)
         $cmd.Parameters[3].Value = fnLocal_GetStringFromObject($userDetails.UserLastLoginDate)
         
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()    
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
     return $sqlResult
 }
 
 
-function fnSp_InsertAdUsers($adUsers){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
 
-    
+function fnSp_InsertAdUsers($adUsers){
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psAdUsers"
@@ -537,35 +430,19 @@ function fnSp_InsertAdUsers($adUsers){
         $cmd.Parameters[25].Value = fnLocal_GetStringFromObject($adUsers.EmployeeID)
         $cmd.Parameters[26].Value = fnLocal_GetStringFromObject($adUsers.Manager)
 
-        
-        
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery() 
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
     return $sqlResult
 }
 
 function fnSp_InsertAdGroups($grp){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-
-    
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psAdGroups"
@@ -593,34 +470,19 @@ function fnSp_InsertAdGroups($grp){
         $cmd.Parameters[7].Value = fnLocal_GetStringFromObject($grp.whenCreated)
         $cmd.Parameters[8].Value = fnLocal_GetStringFromObject($grp.mail)
         
-        
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()  
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
     return $sqlResult
 }
 
 function fnSp_InsertAdGroupMembers($GroupMember){
-    $conn = New-Object System.Data.SqlClient.SqlConnection
-    $ConnString = fnConfig_GetSqlConnectionString
-    $conn.ConnectionString =  $ConnString
-
-    
     try{
-        $conn.Open()
+        $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
         $cmd.CommandType = 'StoredProcedure'
         $cmd.CommandText = "dbo.spInsert_psAdGroupMembers"
@@ -633,24 +495,13 @@ function fnSp_InsertAdGroupMembers($GroupMember){
         $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($GroupMember.GroupsAMAccountName)
         $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($GroupMember.sAMAccountName)
         $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($GroupMember.ObjectClass)
-
         
-        
-        $cmd.CommandTimeout = 0
-        $cmd.ExecuteNonQuery()
-        
-        $sqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
-        $sqlAdapter.SelectCommand = $cmd
-        $DataSet =  New-Object System.Data.DataSet
-        $sqlAdapter.Fill($DataSet)
-        $sqlResult = $DataSet.Tables[0]   
+        $cmd.ExecuteNonQuery()    
     }catch{
         write-host "failed"
         Write-Host $Error[0].Exception.Message
     }finally{
-        $conn.Dispose()
-        $cmd.Dispose()
-        $conn.Close()
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
     }   
     return $sqlResult
 }
