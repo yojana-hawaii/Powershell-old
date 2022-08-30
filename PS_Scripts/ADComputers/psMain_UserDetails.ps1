@@ -4,6 +4,7 @@
 . "$PSScriptRoot\psStoredProcedure.ps1"
 
 
+
 $gStart_time = fnTest_GetCurrentTime
 
 
@@ -25,10 +26,13 @@ $gStart_time = fnTest_GetCurrentTime
 #     fnSp_InsertAdGroupMembers($member)
 # }
 
-$deltaChangeUser = fnAD_GetUserDetails_Delta
-foreach($user in $deltaChangeUser){
-    fnSp_InsertAdUsers($user)
-}
+# $deltaChangeUser = fnAD_GetUserDetails_Delta
+# foreach($user in $deltaChangeUser){
+#     fnSp_InsertAdUsers($user)
+# }
+
+
+
 
 $gEnd_time = fnTest_GetCurrentTime
 $gDuration = $gEnd_time - $gStart_time
