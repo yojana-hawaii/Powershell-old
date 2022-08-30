@@ -46,7 +46,7 @@ function fnSp_CleanUpTables{
     }   
     return $sqlResult
 }
-function fnSp_GetRandomComputersUsingStoredProc{
+function fnSp_GetRandomUnscannedComputers{
     try{
         $conn = fnLocal_GetSQLConnection
         $cmd = $conn.CreateCommand()
