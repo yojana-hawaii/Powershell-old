@@ -7,22 +7,27 @@
 $gStart_time = fnTest_GetCurrentTime
 
 
-$adUsers = fnAD_GetUserDetails
-foreach($user in $adUsers){
-    fnSp_InsertAdUsers($user)
-}
+# $adUsers = fnAD_GetUserDetails
+# foreach($user in $adUsers){
+#     fnSp_InsertAdUsers($user)
+# }
     
 
-$adgroups = fnAD_GetGroups
-foreach($grp in $adgroups){
-    # $grp
-    fnSp_InsertAdGroups($grp)
-}
+# $adgroups = fnAD_GetGroups
+# foreach($grp in $adgroups){
+#     # $grp
+#     fnSp_InsertAdGroups($grp)
+# }
 
-$adGroupMembers = fnAd_GetGroupMembers
-foreach($member in $adGroupMembers){
-    # $member
-    fnSp_InsertAdGroupMembers($member)
+# $adGroupMembers = fnAd_GetGroupMembers
+# foreach($member in $adGroupMembers){
+#     # $member
+#     fnSp_InsertAdGroupMembers($member)
+# }
+
+$deltaChangeUser = fnAD_GetUserDetails_Delta
+foreach($user in $deltaChangeUser){
+    fnSp_InsertAdUsers($user)
 }
 
 $gEnd_time = fnTest_GetCurrentTime

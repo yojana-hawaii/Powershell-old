@@ -8,6 +8,7 @@
 . "$PSScriptRoot\psPrinter_GetDetails.ps1"
 . "$PSScriptRoot\psMonitor_GetDetails.ps1"
 . "$PSScriptRoot\psUsers_GetComputerUsers.ps1"
+. "$PSScriptRoot\psAD_GetUsersAndGroups.ps1"
 
 $gStart_time = fnTest_GetCurrentTime
 
@@ -63,10 +64,6 @@ function fnLocal_Main($computerList){
     }
     <# Run AD Users and Groups and Members 11pm Daily #>
     if ($time -like "23*" ){
-        $adUsers = fnAD_GetUserDetails
-        foreach($user in $adUsers){
-            fnSp_InsertAdUsers($user)
-        }
             
         $adgroups = fnAD_GetGroups
         foreach($grp in $adgroups){
@@ -87,6 +84,11 @@ function fnLocal_Main($computerList){
     } else {
         $randomComputers =  fnSp_GetRandomComputersUsingStoredProc
         fnLocal_ComputersToScan($randomComputers)
+    }
+
+    $deltaChangeUser = fnAD_GetUserDetails_Delta
+    foreach($user in $deltaChangeUser){
+        fnSp_InsertAdUsers($user)
     }
 
     fnSp_CleanUpTables
