@@ -8,10 +8,10 @@
 $gStart_time = fnTest_GetCurrentTime
 
 
-# $adUsers = fnAD_GetUserDetails
-# foreach($user in $adUsers){
-#     fnSp_InsertAdUsers($user)
-# }
+$adUsers = fnAD_GetAllUsersAgainSqlTabledTruncated
+foreach($user in $adUsers){
+    fnSp_InsertAdUsers($user)
+}
     
 
 # $adgroups = fnAD_GetGroups
