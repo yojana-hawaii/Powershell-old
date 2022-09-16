@@ -1,3 +1,4 @@
 . "$PSScriptRoot\psFileManagement.ps1"
 
 fnFileMgmt_FileByYearMonthDay
+fnFileMgmt_MoveAndDeleteOldLinkLogicFiles
