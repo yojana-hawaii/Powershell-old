@@ -8,7 +8,7 @@
 $gStart_time = fnTest_GetCurrentTime
 
 
-$adUsers = fnAD_GetAllUsersAgainSqlTabledTruncated
+$adUsers = fnAD_GetAllUsers_NotDelta_SqlTabledTruncated
 foreach($user in $adUsers){
     fnSp_InsertAdUsers($user)
 }

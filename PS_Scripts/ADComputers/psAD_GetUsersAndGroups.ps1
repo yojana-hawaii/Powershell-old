@@ -35,7 +35,7 @@ function fnAd_GetGroupMembers {
     return $GroupMembers
 }
 
-function fnAD_GetAllUsersAgainSqlTabledTruncated {  
+function fnAD_GetAllUsers_NotDelta_SqlTabledTruncated {  
     
     $users = Get-ADUser -Filter * -Properties * |
                 Select-Object  CanonicalName, sAMAccountName, GivenName, SurName, DisplayName, `
