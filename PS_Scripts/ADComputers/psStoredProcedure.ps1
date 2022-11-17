@@ -39,7 +39,7 @@ function fnSp_CleanUpTables{
 
         $cmd.ExecuteNonQuery()    
     }catch{
-        write-host "failed"
+        write-host "Clean up table sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -59,7 +59,7 @@ function fnSp_GetRandomUnscannedComputers{
         $data = New-Object System.Data.DataTable
         $data.Load($result)
     }catch{
-        write-host "failed"
+        write-host "Get Random Computer sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -114,7 +114,7 @@ function fnSp_InsertAdComputers($pADDetails){
 
         $cmd.ExecuteNonQuery()    
     }catch{
-        write-host "failed"
+        write-host "Insert AD Computer details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -212,7 +212,7 @@ function fnSp_InsertHardwareDetails($pHardwareDetails){
 
         $cmd.ExecuteNonQuery()   
     }catch{
-        write-host "failed"
+        write-host "Insert hardware details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -245,7 +245,7 @@ function fnSp_InsertSoftwareDetails($pSoftwareDetails){
         
         $cmd.ExecuteNonQuery()   
     }catch{
-        write-host "failed"
+        write-host "Insert software details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -281,7 +281,7 @@ function fnSp_InsertPrinterDetails($printerDetails){
 
         $cmd.ExecuteNonQuery()   
     }catch{
-        write-host "failed"
+        write-host "Insert printer details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -320,7 +320,7 @@ function fnSp_InsertMonitorDetails($monitorDetails){
 
         $cmd.ExecuteNonQuery()   
     }catch{
-        write-host "failed"
+        write-host "Insert monitor details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -350,7 +350,7 @@ function fnSp_InsertUserLoginHistory($userDetails){
         
         $cmd.ExecuteNonQuery()    
     }catch{
-        write-host "failed"
+        write-host "Insert user login history details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -432,7 +432,7 @@ function fnSp_InsertAdUsers($adUsers){
 
         $cmd.ExecuteNonQuery() 
     }catch{
-        write-host "failed"
+        write-host "Insert AD User details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -472,7 +472,7 @@ function fnSp_InsertAdGroups($grp){
         
         $cmd.ExecuteNonQuery()  
     }catch{
-        write-host "failed"
+        write-host "Insert AD Group details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
@@ -498,7 +498,7 @@ function fnSp_InsertAdGroupMembers($GroupMember){
         
         $cmd.ExecuteNonQuery()    
     }catch{
-        write-host "failed"
+        write-host "Insert AD Group Member details sp failed"
         Write-Host $Error[0].Exception.Message
     }finally{
         fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
