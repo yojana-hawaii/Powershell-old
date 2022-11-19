@@ -50,18 +50,26 @@ function fnHardware_GetLocalComputerDetails($pComputer){
     if($ping) {
         write-host "Ping success"
 
-        $securityPatch = Get-HotFix -Description Security* -ComputerName $localCompName | Sort-Object InstalledOn -Descending | Select-Object -First 1 
-        $AnyPatch = Get-HotFix  -ComputerName $localCompName | Sort-Object InstalledOn -Descending | Select-Object -First 1 
-        write-host "patch complete"
+        try {
+            $securityPatch = Get-HotFix -Description Security* -ComputerName $localCompName | Sort-Object InstalledOn -Descending | Select-Object -First 1 
+            $AnyPatch = Get-HotFix  -ComputerName $localCompName | Sort-Object InstalledOn -Descending | Select-Object -First 1 
+            write-host "patch complete"
+        }catch{
+            write-host "patch detail failed"
+        }
 
-        $bios_class = Get-WmiObject -ClassName win32_bios -ComputerName $localCompName | Select-Object SerialNumber, SMBIOSBIOSVersion, ReleaseDate
-        $computerSystem_class = Get-WmiObject -ClassName win32_computersystem -ComputerName $localCompName | Select-Object Manufacturer, Model, TotalPhysicalMemory,UserName,WakeUpType
-        $processor_class = Get-WmiObject -ClassName win32_processor -ComputerName $localCompName | Select-Object Name
-        $os_class = Get-WmiObject -ClassName win32_operatingsystem -ComputerName $localCompName | Select-Object LastBootUpTime, EncryptionLevel, NumberOfUsers,OSArchitecture
-        $disk_class = Get-WmiObject -ClassName Win32_DiskDrive -ComputerName $localCompName | select-object Model, @{Name = "HDD_Size_GB"; Exp={$_.Size / 1Gb -as [int]}}
-        $physicalDisk_class = Get-WmiObject -ClassName MSFT_PhysicalDisk -ComputerName $localCompName -Namespace root\Microsoft\Windows\Storage  | Select-Object MediaType
-        $tpm_class = Get-WmiObject -ClassName Win32_Tpm -Namespace root\CIMV2\Security\MicrosoftTpm -ComputerName $localCompName -Authentication PacketPrivacy | Select-Object IsEnabled_InitialValue, SpecVersion
-        write-host "WMI complete"
+        try {
+            $bios_class = Get-WmiObject -ClassName win32_bios -ComputerName $localCompName | Select-Object SerialNumber, SMBIOSBIOSVersion, ReleaseDate
+            $computerSystem_class = Get-WmiObject -ClassName win32_computersystem -ComputerName $localCompName | Select-Object Manufacturer, Model, TotalPhysicalMemory,UserName,WakeUpType
+            $processor_class = Get-WmiObject -ClassName win32_processor -ComputerName $localCompName | Select-Object Name
+            $os_class = Get-WmiObject -ClassName win32_operatingsystem -ComputerName $localCompName | Select-Object LastBootUpTime, EncryptionLevel, NumberOfUsers,OSArchitecture
+            $disk_class = Get-WmiObject -ClassName Win32_DiskDrive -ComputerName $localCompName | select-object Model, @{Name = "HDD_Size_GB"; Exp={$_.Size / 1Gb -as [int]}}
+            $physicalDisk_class = Get-WmiObject -ClassName MSFT_PhysicalDisk -ComputerName $localCompName -Namespace root\Microsoft\Windows\Storage  | Select-Object MediaType
+            $tpm_class = Get-WmiObject -ClassName Win32_Tpm -Namespace root\CIMV2\Security\MicrosoftTpm -ComputerName $localCompName -Authentication PacketPrivacy | Select-Object IsEnabled_InitialValue, SpecVersion
+            write-host "WMI complete"
+        } catch {
+            Write-Host "WMI Failed"
+        }
 
         $path = "\\" + $localCompName + "\C$\Windows\System32\"
         $localspl = $path + "localspl.dll"
