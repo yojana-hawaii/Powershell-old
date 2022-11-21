@@ -104,7 +104,7 @@ function fnHardware_GetLocalComputerDetails($pComputer){
             Manufacturer = $computerSystem_class.Manufacturer
             Model = $computerSystem_class.Model
             RAM_GB = [MATH]::Round( ($computerSystem_class.TotalPhysicalMemory / 1Gb), 2 )
-            VM = if ($computerSystem_class.Model -like 'virtual*') {1} else {0}
+            VM = if ($computerSystem_class.Model -like 'virtual*' -or $computerSystem_class.Model -like "VMWare*") {1} else {0}
             CurrentUser = $computerSystem_class.UserName
             WakeUpType = fnLocal_WakupTpye($computerSystem_class.WakeUpType)
             
