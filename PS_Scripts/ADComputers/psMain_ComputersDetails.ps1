@@ -11,6 +11,7 @@
 . "$PSScriptRoot\psAD_GetUsersAndGroups.ps1"
 
 $gStart_time = fnTest_GetCurrentTime
+$gHour = Get-Date -UFormat "%H"
 
 <#Get Delta changes from AD and insert the changes in SQL#>
 function fnLocal_ADComputersUsersAndGroups_DeltaChange {
@@ -30,7 +31,7 @@ function fnLocal_ADComputersUsersAndGroups_DeltaChange {
     foreach ($comp in $adComp) {
         fnSp_InsertAdComputers($comp)
     }
-    fnInactive_DisableAndMoveOU
+    if ( $gHour -eq 20){fnInactive_DisableAndMoveOU} else {write-host "AD move -> not 8pm"}
 }
 
 function fnLocal_RunHardwareStoredProc($pHardwareProperties) {
