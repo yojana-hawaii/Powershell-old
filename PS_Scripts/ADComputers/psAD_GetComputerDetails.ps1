@@ -73,6 +73,7 @@ function fnAD_GetInactiveComputers($startDay, $endDay){
     $OUs = fnConfig_GetWorkstationOU
     $remoteOu = fnConfig_GetRemoteOU
     $outoNetworkOU = fnConfig_GetOutofNetworkOU
+    $thinOU = fnConfig_GetThinClientOU
     $PSCustom_CompDetails = @()
 
     foreach($ou in $OUs){
@@ -81,7 +82,8 @@ function fnAD_GetInactiveComputers($startDay, $endDay){
                 -Filter {LastLogonTimeStamp -gt $startDate -and LastLogonTimeStamp -le $Endate } `
                 -SearchBase $ou | 
                     Where-Object {$_.DistinguishedName -notlike $outoNetworkOU `
-                                    -and $_.DistinguishedName -notlike $remoteOu } |
+                                    -and $_.DistinguishedName -notlike $remoteOu `
+                                    -and $_.DistinguishedName -notlike $thinOU } |
                     Select-Object Name, LastLogonTimeStamp, LastLogonDate,DistinguishedName
     
         foreach ($comp in $inactiveList){
