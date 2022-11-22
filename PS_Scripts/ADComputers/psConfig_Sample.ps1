@@ -40,3 +40,7 @@ function fnConfig_GetRemoteOU{
 function fnConfig_GetThinClientOU{
     return "OU=Thin Client,DC=example,DC=com"
 }
+
+function fnConfig_GetWorkstationOU{
+    return "OU=Workstations_OU1,DC=example,DC=com", "OU=Workstations_OU1,DC=example,DC=com", "OU=Disabled Computer,DC=example,DC=com"
+}
