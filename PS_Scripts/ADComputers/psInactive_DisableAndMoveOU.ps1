@@ -30,18 +30,23 @@ function fnInactive_DisableAndMoveOU{
     fnLocal_MoveOU -inactiveList $Inactive90 -ou $90Plus
     fnLocal_DisableComputers($Inactive90)
     
+    write-host $60Plus
+    $Inactive60 = fnAD_GetInactiveComputers  -startDay 90 -endDay  60
+    fnLocal_MoveOU -inactiveList $Inactive30 -ou $60Plus
+    fnLocal_DisableComputers($Inactive60)
+
     write-host $30Plus
-    $Inactive30 = fnAD_GetInactiveComputers  -startDay 90 -endDay  30
+    $Inactive30 = fnAD_GetInactiveComputers  -startDay 60 -endDay  30
     fnLocal_MoveOU -inactiveList $Inactive30 -ou $30Plus
 
-    write-host $14Plus
-    $Inactive14 = fnAD_GetInactiveComputers  -startDay 30 -endDay  14
-    fnLocal_MoveOU -inactiveList $Inactive14 -ou $14Plus
+    # write-host $14Plus
+    # $Inactive14 = fnAD_GetInactiveComputers  -startDay 30 -endDay  14
+    # fnLocal_MoveOU -inactiveList $Inactive14 -ou $14Plus
 }
 
 function fnInactive_ManualDisableAndMove($pComputer){
     $localCompName = $pComputer.Name
-    $lComputerSMA = $pComputer.sAMAccountName
+    # $lComputerSMA = $pComputer.sAMAccountName
     $startDay = 14
     $startDate = (Get-Date).AddDays(-($startDay) ) 
     $Inactive14 = Get-ADComputer -Identity $localCompName -Properties * | Select-Object Name,DistinguishedName, LastLogonDate, @{name="inactive"; Expression={$_.LastLogonDate -le $startDate -and $_.OperatingSystem -notlike '*server*'};}
@@ -49,11 +54,12 @@ function fnInactive_ManualDisableAndMove($pComputer){
     fnLocal_MoveOU -inactiveList $Inactive14 -ou $14Plus
     # return $adProperties?
 }
-    $disabledServer = fnConfig_GetInactiveServerOU
+    # $disabledServer = fnConfig_GetInactiveServerOU
     $365Plus = fnConfig_GetInactive365PlusOU
     $180Plus = fnConfig_GetInactive180PlusOU
     $90Plus = fnConfig_GetInactive90PlusOU
+    $60Plus = fnConfig_GetInactive60PlusOU
     $30Plus = fnConfig_GetInactive30PlusOU
-    $14Plus = fnConfig_GetInactive14PlusOU
+    # $14Plus = fnConfig_GetInactive14PlusOU
 
     # fnInactive_DisableAndMoveOU
