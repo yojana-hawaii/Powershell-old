@@ -83,7 +83,8 @@ function fnAD_GetInactiveComputers($startDay, $endDay){
                 -SearchBase $ou | 
                     Where-Object {$_.DistinguishedName -notlike $outoNetworkOU `
                                     -and $_.DistinguishedName -notlike $remoteOu `
-                                    -and $_.DistinguishedName -notlike $thinOU } |
+                                    -and $_.DistinguishedName -notlike $thinOU `
+                                    -and $_.Enabled -eq $true } |
                     Select-Object Name, LastLogonTimeStamp, LastLogonDate,DistinguishedName
     
         foreach ($comp in $inactiveList){
