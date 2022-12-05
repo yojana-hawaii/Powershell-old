@@ -76,6 +76,12 @@ function fnHardware_GetLocalComputerDetails($pComputer){
         $spoolsv = $path + "spoolsv.exe"
         $win32spl =  $path + "win32spl.dll"
 
+        $dell_old = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "DellMgmtAgent"
+        $dell_new = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "CMGShield"
+        $dell = "missing"
+        if ($dell_new -eq "running") {$dell = "Running new"} 
+        if ($dell_old -eq "running") {$dell = "Running old"}
+
         $PSCustom_CompDetails = @()
         $PSCustom_CompDetails = [PSCustomObject]@{
             Name = $localCompName
@@ -92,7 +98,7 @@ function fnHardware_GetLocalComputerDetails($pComputer){
             Kace_status = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "konea"
             Sentinel_Status = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "SysAidAgent"
             Sysaid_Status = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "SentinelAgent"
-            DellEncryption_Status = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "DellMgmtAgent"
+            DellEncryption_Status =  $dell
             Cylance_Status = fnLocal_GetServiceStatus -pComputerName $localCompName -pServiceName "CylanceSvc"
 
             IsLaptop = fnLocal_isLaptop($localCompName)
