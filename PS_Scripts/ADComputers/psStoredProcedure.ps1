@@ -67,6 +67,48 @@ function fnSp_GetRandomUnscannedComputers{
     return $data
 }
 
+function fnSp_GetPossibleDeletedComputers{
+    try{
+        $conn = fnLocal_GetSQLConnection
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spGet_psPossibleDeletedComputers"
+
+        $cmd.CommandTimeout = 0
+        $result = $cmd.ExecuteReader()
+        
+        $data = New-Object System.Data.DataTable
+        $data.Load($result)
+    }catch{
+        write-host "Get 30 days unscanned (posibly deleted) computer sp failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
+    }   
+    return $data
+}
+function fnSp_DeleteComputersNotInAD($pADDetails){
+    try{
+        $conn = fnLocal_GetSQLConnection
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spDelete_psADNotFound"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@sAMAccountName", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($pADDetails.sAMAccountName)
+
+        $cmd.ExecuteNonQuery()    
+    }catch{
+        write-host "delete computers sp failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
+    }   
+    return $sqlResult
+}
+
+
 function fnSp_InsertAdComputers($pADDetails){
     try{
         $conn = fnLocal_GetSQLConnection

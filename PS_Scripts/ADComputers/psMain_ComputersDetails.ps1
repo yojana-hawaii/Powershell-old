@@ -13,6 +13,25 @@
 $gStart_time = fnTest_GetCurrentTime
 $gHour = Get-Date -UFormat "%H"
 
+
+function fnLocal_DeleteComputersNotInAD {
+
+    $computerList = fnSp_GetPossibleDeletedComputers
+    
+    foreach($comp in $computerList){
+        $compName = $comp.Name
+        Write-Host $compName
+        try{
+            Get-ADComputer $compName -ErrorAction Stop
+            Write-Host "found"
+        }
+        catch {
+            Write-Host "not found -> Delete"
+            fnSp_DeleteComputersNotInAD -pADDetails $comp
+        }
+    }
+}
+
 <#Get Delta changes from AD and insert the changes in SQL#>
 function fnLocal_ADComputersUsersAndGroups_DeltaChange {
     $deltaChangeUser = fnAD_GetUserDetails
@@ -32,6 +51,7 @@ function fnLocal_ADComputersUsersAndGroups_DeltaChange {
         fnSp_InsertAdComputers($comp)
     }
     if ( $gHour -eq 20){fnInactive_DisableAndMoveOU} else {write-host "AD move -> not 8pm"}
+    if ( $gHour -eq 21){fnLocal_DeleteComputersNotInAD} else {write-host "Delete Computer -> not 9pm"}
 }
 
 function fnLocal_RunHardwareStoredProc($pHardwareProperties) {
