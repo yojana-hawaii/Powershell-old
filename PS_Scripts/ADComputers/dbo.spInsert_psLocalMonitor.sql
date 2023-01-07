@@ -12,6 +12,7 @@ create table dbo.psLocalMonitor(
 	MonitorYear varchar(50) null,
 	MonitorCaption varchar(50) null,
 	MonitorResolution varchar(50) null,
+	ScanSuccessDate datetime2 null,
 );
 go
 drop proc if exists dbo.spInsert_psLocalMonitor;
@@ -37,7 +38,8 @@ begin
 		MonitorManufacturer = @MonitorManufacturer,
 		MonitorYear = @MonitorYear,
 		MonitorCaption = @MonitorCaption,
-		MonitorResolution = @MonitorResolution
+		MonitorResolution = @MonitorResolution,
+		ScanSuccessDate = @now
 	where name = @Name
 		and sAMAccountName = @sAMAccountName
 		and MonitorSerial = @MonitorSerial
@@ -47,11 +49,13 @@ begin
 		insert into ADWarehouse.dbo.psLocalMonitor(
 			sAMAccountName,Name,
 			MonitorName, MonitorManufacturer,MonitorYear, 
-			MonitorCaption, MonitorResolution,MonitorSerial
+			MonitorCaption, MonitorResolution,MonitorSerial,
+			ScanSuccessDate
 		)
 		select @sAMAccountName,@Name,
 			@MonitorName, @MonitorManufacturer,@MonitorYear, 
-			@MonitorCaption, @MonitorResolution,@MonitorSerial
+			@MonitorCaption, @MonitorResolution,@MonitorSerial,
+			@now
 	end
 end
 

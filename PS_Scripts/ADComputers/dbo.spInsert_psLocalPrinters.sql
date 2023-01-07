@@ -1,7 +1,7 @@
 use ADWarehouse
 go
 
-drop table if exists dbo.psLocalPrinters;
+--drop table if exists dbo.psLocalPrinters;
 go
 create table dbo.psLocalPrinters(
 	sAMAccountName varchar(100) not null,
@@ -11,8 +11,10 @@ create table dbo.psLocalPrinters(
 	PrinterDriverName  varchar(50) null,
 	PrinterIP varchar(50) null,
 	PrinterDriverVersion varchar(50) null,
+	ScanSuccessDate datetime not null,
 );
 go
+
 
 drop proc if exists dbo.spInsert_psLocalPrinters;
 go
@@ -29,13 +31,14 @@ create proc dbo.spInsert_psLocalPrinters
 as
 begin
 	declare @now datetime2 = getdate();
-	select @sAMAccountName, @Name
+	--select @sAMAccountName, @Name
 
 	update ADWarehouse.dbo.psLocalPrinters
 	set PrinterName = @PrinterName,
 		PrinterDriverName  =@PrinterDriverName,
 		PrinterDriverVersion = @PrinterDriverVersion,
-		PrinterShared = @PrinterShared
+		PrinterShared = @PrinterShared,
+		ScanSuccessDate = @now
 	where name = @Name
 		and sAMAccountName = @sAMAccountName
 		and PrinterIP = @PrinterIP
@@ -45,14 +48,16 @@ begin
 		insert into ADWarehouse.dbo.psLocalPrinters(
 			sAMAccountName,Name,
 			PrinterDriverName, PrinterDriverVersion, 
-			PrinterIP, PrinterName
+			PrinterIP, PrinterName, 
+			ScanSuccessDate
 		)
 		select @sAMAccountName,@Name,
 			@PrinterDriverName, @PrinterDriverVersion, 
-			@PrinterIP, @PrinterName
+			@PrinterIP, @PrinterName,
+			@now
 	end
 end
 
 go
-select * from dbo.psLocalPrinters
+select * from ADWarehouse.dbo.psLocalPrinters
 go

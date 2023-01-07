@@ -1,7 +1,7 @@
 use [ADWarehouse]
 go
 
---drop table if exists dbo.psLocalComputers;
+drop table if exists dbo.psLocalComputers;
 go
 
 create table dbo.psLocalComputers (
@@ -97,8 +97,12 @@ create proc dbo.spInsert_psLocalComputers
 as
 begin
 	declare @now datetime2 = getdate();
+	--select @Name, @Offline, @sAMAccountName
+
+	--update table if computer online  & name and sAMAccountName matches -> get latest information
 	update ADWarehouse.dbo.psLocalComputers
 	set
+		--Name = @Name,
 		SerialNumber = @SerialNumber,
 		Last_Security_KB = @Last_Security_KB,
 		Last_SecurityPatch_date = convert(date, @Last_SecurityPatch_date),
@@ -141,7 +145,28 @@ begin
 	where Name = @Name
 		and @Offline = 0
 		and sAMAccountName = @sAMAccountName;
+
 	
+	--if online & no match with name and sAMAccountName -> add new entry
+	 if @@ROWCOUNT = 0
+	 begin
+		insert into ADWarehouse.dbo.psLocalComputers(
+			sAMAccountName,Name,SerialNumber,Last_Security_KB,Last_SecurityPatch_date,Print_Status,Kace_status,Sentinel_Status,
+			Sysaid_Status,DellEncryption_Status,Cylance_Status,Print_LocalSpl_date,Print_SpoolSv_date,Print_Win32Spl_date,
+			Manufacturer,Model,RAM_GB,vm,Processor,BiosReleaseDate,BiosVersion,Offline,IsLaptop,LastReboot,Currentuser,WakeUpType,
+			EncryptionLevel,NumberOfUsers,OSArchitechture,DiskModel,DiskSizeGB,DiskType,ScanSuccessDate,ScanAttemptDate,
+			TpmEnabled,TpmVersion,LastPatchKb,LastPatchDate
+		)
+		select 
+			@sAMAccountName,@Name,@SerialNumber,@Last_Security_KB,@Last_SecurityPatch_date,@Print_Status,@Kace_status,@Sentinel_Status,
+			@Sysaid_Status,@DellEncryption_Status,@Cylance_Status,@Print_LocalSpl_date,@Print_SpoolSv_date,@Print_Win32Spl_date,
+			@Manufacturer,@Model,@RAM_GB,@VM,@Processor,@BiosReleaseDate,@BiosVersion,@Offline,@IsLaptop,@LastReboot,@Currentuser,@WakeUpType,
+			@EncryptionLevel,@NumberOfUsers,@OSArchitecture,@DiskModel,@DiskSizeGB,@DiskType,@now,@now,
+			@TpmEnabled,@TpmVersion,@LastPatchKb,@LastPatchDate
+		where @Offline = 0
+	 end
+	
+	--if offline & matches name and sAMAccountName -> update to offline
 	if @@ROWCOUNT = 0
 	begin
 		update ADWarehouse.dbo.psLocalComputers
@@ -153,11 +178,33 @@ begin
 			and sAMAccountName = @sAMAccountName;
 	end
 
+	--if offline & no match with name and sAMAccountName -> add new entry saying offline 
+	if @@ROWCOUNT = 0
+	 begin
+		insert into ADWarehouse.dbo.psLocalComputers(
+			sAMAccountName,Name,SerialNumber,Last_Security_KB,Last_SecurityPatch_date,Print_Status,Kace_status,Sentinel_Status,
+			Sysaid_Status,DellEncryption_Status,Cylance_Status,Print_LocalSpl_date,Print_SpoolSv_date,Print_Win32Spl_date,
+			Manufacturer,Model,RAM_GB,vm,Processor,BiosReleaseDate,BiosVersion,Offline,IsLaptop,LastReboot,Currentuser,WakeUpType,
+			EncryptionLevel,NumberOfUsers,OSArchitechture,DiskModel,DiskSizeGB,DiskType,ScanSuccessDate,ScanAttemptDate,
+			TpmEnabled,TpmVersion,LastPatchKb,LastPatchDate
+		)
+		select 
+			@sAMAccountName,@Name,@SerialNumber,@Last_Security_KB,@Last_SecurityPatch_date,@Print_Status,@Kace_status,@Sentinel_Status,
+			@Sysaid_Status,@DellEncryption_Status,@Cylance_Status,@Print_LocalSpl_date,@Print_SpoolSv_date,@Print_Win32Spl_date,
+			@Manufacturer,@Model,@RAM_GB,@VM,@Processor,@BiosReleaseDate,@BiosVersion,@Offline,@IsLaptop,@LastReboot,@Currentuser,@WakeUpType,
+			@EncryptionLevel,@NumberOfUsers,@OSArchitecture,@DiskModel,@DiskSizeGB,@DiskType,null,@now,
+			@TpmEnabled,@TpmVersion,@LastPatchKb,@LastPatchDate
+		where @Offline = 1
 
+	 end
 
+	select @Name name,@sAMAccountName sam,@Offline offline
 end
 go
+--exec dbo.spInsert_psLocalComputers 'x','y','123',null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null
 
-select * from dbo.psLocalComputers
+select * from ADWarehouse.dbo.psLocalComputers
+where name in ('x','y')
+order by ScanAttemptDate desc
 
 go

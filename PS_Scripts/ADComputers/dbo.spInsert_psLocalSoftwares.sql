@@ -35,13 +35,15 @@ create proc dbo.spInsert_psLocalSoftwares
 as 
 begin
 	declare @now datetime2 = getdate();
-
+	--select @Name, @sAMAccountName, @SoftwareName, @SoftwareVendor
 	update ADWarehouse.dbo.psLocalSoftwares
 	set
 		--SoftwareName = @SoftwareName,
 		SoftwareVendor = @SoftwareVendor,
 		SoftwareVersion = @SoftwareVersion,
-		SoftwareInstallation = @SoftwareInstallation
+		SoftwareInstallation = @SoftwareInstallation,
+		ScanAttemptDate = @now, 
+		ScanSuccessDate = @now
 	where Name = @Name
 		and sAMAccountName = @sAMAccountName
 		and SoftwareName = @SoftwareName;
@@ -58,6 +60,7 @@ begin
 			@SoftwareName, @SoftwareVendor, @SoftwareVersion,@SoftwareInstallation,
 			@now, @now
 	 end
+	 
 end 
 
 go

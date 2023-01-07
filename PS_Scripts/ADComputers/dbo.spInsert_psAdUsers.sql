@@ -29,7 +29,7 @@ CREATE TABLE [dbo].[psADUSers](
 	[Description] nvarchar(100) NULL,
 	[Manager] nvarchar(100) NULL,
 
-	[WhenCreated] date NULL,
+	[WhenCreated] datetime NULL,
 	[LastLogonDate] date NULL,
 	AccountExpires date null,
 	PasswordLastSet date not null,
@@ -37,7 +37,7 @@ CREATE TABLE [dbo].[psADUSers](
 	PasswordNeverExpires bit not null,
 	PasswordExpired bit not null,
 
-	UpdateDate datetime not null
+	ScanSuccessDate datetime not null
 
  CONSTRAINT [PK_dimADUsers] PRIMARY KEY CLUSTERED 
 (
@@ -113,7 +113,7 @@ begin
 		Enabled = @Enabled,
 		AccountExpires = convert(date,@AccountExpires),
 		LastLogonDate = convert(date,@LastLogonDate),
-		WhenCreated = convert(date, @WhenCreated),
+		WhenCreated = convert(datetime, @WhenCreated),
 		PasswordLastSet = convert(date,@PasswordLastSet), 
 		PasswordNeverExpires = @PasswordNeverExpires, 
 		[PasswordExpired] = @PasswordExpired, 
@@ -121,7 +121,7 @@ begin
 		LogonCount = @LogonCount, 
 		EmployeeID = @EmployeeId, 
 		Manager = @Manager,
-		UpdateDate = @now
+		ScanSuccessDate = @now
 	where 
 		UserName = @sAMAccountName
 
@@ -139,7 +139,7 @@ begin
 			LastLogonDate,
 			WhenCreated,
 			PasswordLastSet,
-			UpdateDate
+			ScanSuccessDate
 		)
 		select 
 			@sAMAccountName, @CanonicalName, @FirstName, @LastName, @DisplayName,
@@ -151,7 +151,7 @@ begin
 			@PasswordExpired, 
 			convert(date,@AccountExpires), 
 			convert(date,@LastLogonDate), 
-			convert(date, @WhenCreated), 
+			convert(datetime, @WhenCreated), 
 			convert(date,@PasswordLastSet),
 			@now
 	end

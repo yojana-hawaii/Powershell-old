@@ -7,7 +7,7 @@ create table dbo.psAdGroupMembers(
 	GroupSamAccountName nvarchar(100) not null,
 	Username nvarchar(100) null,
 	ObjectClass nvarchar(100) null,
-	UpdateDate datetime not null,
+	ScanSuccessDate datetime not null,
 	)
 go
 drop proc if exists dbo.spInsert_psAdGroupMembers;
@@ -25,7 +25,7 @@ begin
 	declare @now datetime =  getdate();
 
 	update ADWarehouse.dbo.psAdGroupMembers
-	set UpdateDate = @now
+	set ScanSuccessDate = @now
 	where
 		GroupSamAccountName = @GroupSamAccountName
 		and Username = @UserName
@@ -35,7 +35,7 @@ begin
 	begin
 		insert into ADWarehouse.dbo.psAdGroupMembers (
 			GroupSamAccountName, Username, ObjectClass,
-			UpdateDate
+			ScanSuccessDate
 			)
 		select @GroupSamAccountName, @UserName, @ObjectClass,
 			@now

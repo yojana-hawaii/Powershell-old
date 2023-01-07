@@ -6,7 +6,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
---drop table if exists dbo.psADComputers;
+drop table if exists dbo.psADComputers;
 go
 create table dbo.psADComputers (
 	sAMAccountName varchar(100) not null,
@@ -20,17 +20,20 @@ create table dbo.psADComputers (
 	LogonCount int null,
 	[Description] nvarchar(max) null,
 	OU varchar(100) not null,
-	[Active] tinyint not null,
-	[Server] tinyint not null,
-	[Thin_Client] tinyint not null,
 	BitLockerPasswordDate datetime2 null,
 	OperatingSystem varchar(100)  null,
 	OperatingSystemVersion varchar(100)  null,
 	OSVersion varchar(50) null,
 	[Location] varchar(50) null,
-	LastUpdated datetime2 not null,
-	BitLockerEnabled tinyint null,
 
+	[Active] tinyint not null,
+	[Server] tinyint not null,
+	[Thin_Client] tinyint not null,
+	BitLockerEnabled tinyint  null,
+	VPN tinyint  null,
+	LocalDetails tinyint  null,
+
+	ScanSuccessDate datetime2 not null,
 );
 
 go
@@ -79,7 +82,7 @@ as begin
 		OperatingSystem = @OperatingSystem,
 		OperatingSystemVersion = @OperatingSystemVersion,
 		OSVersion = @OSVersion,
-		LastUpdated = getdate()
+		ScanSuccessDate = getdate()
 
 	where 
 		sAMAccountName = @sAMAccountName
@@ -91,7 +94,7 @@ as begin
             IPV4Address, LastLogonDate,LogonCount,[Description],
 			OU,Active,[Server],Thin_Client,BitLockerPasswordDate,
             OperatingSystem,OperatingSystemVersion, OSVersion,sAMAccountName,
-			LastUpdated
+			ScanSuccessDate
 		)
 	select 
 		@Name, @DistinguishedName, @Created, @Modified, @UserAccountControl,

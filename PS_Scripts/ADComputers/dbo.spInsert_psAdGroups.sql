@@ -14,7 +14,7 @@ create table psADGroups
 	GroupScope nvarchar(100) null,
 	CreatedDate datetime null,
 	Email nvarchar(100) null,
-	UpdateDate datetime not null
+	ScanSuccessDate datetime not null,
 )
 
 go
@@ -51,7 +51,7 @@ begin
 		GroupScope = @GroupScope,
 		CreatedDate = convert(date,@WhenCreated),
 		Email = @Email,
-		UpdateDate = @now
+		ScanSuccessDate = @now
 	where 
 		SamAccountName = @sAMAccountName
 
@@ -59,7 +59,7 @@ begin
 	begin
 		insert ADWarehouse.dbo.psADGroups (
 			CanonicalName, DisplayName, Description, DistinguishedName, GroupCategory,
-			GroupScope, CreatedDate, Email, SamAccountName, UpdateDate
+			GroupScope, CreatedDate, Email, SamAccountName, ScanSuccessDate
 			)
 		select @CanonicalName, @Name, @Description,
 			@DistinguishedName, @GroupCategory, 
