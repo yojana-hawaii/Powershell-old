@@ -16,11 +16,19 @@ function fnLocal_DisableComputers($inactiveList){
         Get-ADComputer -Identity $comp.Name | Disable-ADAccount -PassThru
     }
 }
+
+function fnLocal_RemoveProtection($inactiveList) {
+    foreach ($comp in $inactiveList) {
+        Get-ADComputer -Identity $comp.Name | Set-ADObject -ProtectedFromAccidentalDeletion $false
+    }
+}
 function fnInactive_DisableAndMoveOU{
+    
     write-host $365Plus
     $Inactive365 = fnAD_GetInactiveComputers  -startDay 153982 -endDay  366
     fnLocal_MoveOU -inactiveList $Inactive365 -ou $365Plus
     fnLocal_DisableComputers($Inactive365)
+    fnLocal_RemoveProtection($Inactive365)
 
     write-host $180Plus
     $Inactive180 = fnAD_GetInactiveComputers  -startDay 365 -endDay  181
