@@ -52,6 +52,8 @@ function fnLocal_ADComputersUsersAndGroups_DeltaChange {
     }
     if ( $gHour -eq 20){fnInactive_DisableAndMoveOU} else {write-host "AD move -> not 8pm"}
     if ( $gHour -eq 21){fnLocal_DeleteComputersNotInAD} else {write-host "Delete Computer -> not 9pm"}
+    if ( $gHour -eq 22){fnInactive_RemoveProtection} else {write-host "Remove Protection -> not 10pm"}
+
 }
 
 function fnLocal_RunHardwareStoredProc($pHardwareProperties) {

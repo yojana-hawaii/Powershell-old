@@ -30,7 +30,9 @@ function fnConfig_GetInactive365PlusOU{
 function fnConfig_GetInactiveServerOU{
     return "OU=DisabledServers,OU=Disabled Computer,DC=example,DC=com"
 }
-
+function fnConfig_GetDisabledComputerOU{
+    return "OU=Disabled Computer,DC=exampple,DC=com"
+}
 function fnConfig_GetOutofNetworkOU{
     return "*OU=Out Of Network,DC=example,DC=com"
 }
