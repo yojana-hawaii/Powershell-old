@@ -25,8 +25,16 @@ function fnLocal_isLaptop($ComputerName){
 function fnLocal_WakupTpye($pWakeupCode){
     $wake = ''
         switch($pWakeupCode){
-            6 {$wake = 'Power Switch'; break} 
+            0 {$wake = 'Reserved'; break} 
+            1 {$wake = 'Other'; break} 
+            2 {$wake = 'Unknown'; break} 
+            3 {$wake = 'APM Timer'; break} 
+            4 {$wake = 'Modem Ring'; break} 
             5 {$wake = 'LAN Remote'; break} 
+            6 {$wake = 'Power Switch'; break} 
+            7 {$wake = 'PCI PME#'; break}
+            8 {$wake = 'AC Power Restored'; break} 
+
             Default {$wake = $pWakeupCode} 
 
         }
