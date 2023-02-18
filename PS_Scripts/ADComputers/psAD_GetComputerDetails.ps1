@@ -69,8 +69,11 @@ function fnAD_GetADPropertiesSelectComputers($pComputerList){
 
 function fnAD_GetDisabledComputerOver365Days{
     $365Plus = fnConfig_GetInactive365PlusOU
-
-    $365Plus_list = Get-ADComputer -Filter {LastLogonTimeStamp -gt 153982 -and LastLogonTimeStamp -le 366 } -SearchBase $365Plus | 
+    $startDay = 153982 
+    $endDay = 366
+    $startDate = (Get-Date).AddDays(-($startDay) ) 
+    $Endate = (Get-Date).AddDays(-($endDay) )
+    $365Plus_list = Get-ADComputer -Filter {LastLogonTimeStamp -gt $startDate -and LastLogonTimeStamp -le $Endate } -SearchBase $365Plus | 
                         Where-Object {$_.Enabled -eq $false} | 
                         Select-Object Name, LastLogonTimeStamp, LastLogonDate,DistinguishedName
     return $365Plus_list
