@@ -3,19 +3,22 @@
 function fnLocal_Getwin10version($pVersionNumber){
     $lWin10Version = ''
     switch ($pVersionNumber) {
-        '10.0 (19044)' {  $lWin10Version = '21H2'; break }
-        '10.0 (19043)' {  $lWin10Version = '21H1'; break }
-        '10.0 (19042)' {  $lWin10Version = '20H2'; break }
-        '10.0 (19041)' {  $lWin10Version = '20H1'; break }
-        '10.0 (18363)' {  $lWin10Version = '19H2'; break }
-        '10.0 (18362)' {  $lWin10Version = '19H1'; break }
-        '10.0 (17763)' {  $lWin10Version = '1809'; break }
-        '10.0 (17134)' {  $lWin10Version = '1803'; break }
-        '10.0 (16299)' {  $lWin10Version = '1709'; break }
-        '10.0 (15063)' {  $lWin10Version = '1703'; break }
-        '10.0 (14393)' {  $lWin10Version = '1607'; break }
-        '10.0 (10586)' {  $lWin10Version = '1511'; break }
-        '10.0 (10240)' {  $lWin10Version = '1507'; break }
+        '10.0 (22621)' {  $lWin10Version = 'Win 11 22H2'; break }
+        '10.0 (22000)' {  $lWin10Version = 'Win 11 21H2'; break }
+        '10.0 (19045)' {  $lWin10Version = 'Win 10 22H2'; break }
+        '10.0 (19044)' {  $lWin10Version = 'Win 10 21H2'; break }
+        '10.0 (19043)' {  $lWin10Version = 'Win 10 21H1'; break }
+        '10.0 (19042)' {  $lWin10Version = 'Win 10 20H2'; break }
+        '10.0 (19041)' {  $lWin10Version = 'Win 10 20H1'; break }
+        '10.0 (18363)' {  $lWin10Version = 'Win 10 19H2'; break }
+        '10.0 (18362)' {  $lWin10Version = 'Win 10 19H1'; break }
+        '10.0 (17763)' {  $lWin10Version = 'Win 10 1809'; break }
+        '10.0 (17134)' {  $lWin10Version = 'Win 10 1803'; break }
+        '10.0 (16299)' {  $lWin10Version = 'Win 10 1709'; break }
+        '10.0 (15063)' {  $lWin10Version = 'Win 10 1703'; break }
+        '10.0 (14393)' {  $lWin10Version = 'Win 10 1607'; break }
+        '10.0 (10586)' {  $lWin10Version = 'Win 10 1511'; break }
+        '10.0 (10240)' {  $lWin10Version = 'Win 10 1507'; break }
         Default { $lWin10Version = $pVersionNumber }
     }
     return $lWin10Version
