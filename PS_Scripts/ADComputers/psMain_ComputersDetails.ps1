@@ -32,12 +32,7 @@ function fnLocal_DeleteComputersNotInAD {
     }
 }
 
-<#Get Delta changes from AD and insert the changes in SQL#>
-function fnLocal_ADComputersUsersAndGroups_DeltaChange {
-    $deltaChangeUser = fnAD_GetUserDetails
-    foreach ($user in $deltaChangeUser) {
-        fnSp_InsertAdUsers($user)
-    }
+function fnLocal_AdGroups{
     $adgroups = fnAD_GetGroups
     foreach ($grp in $adgroups) {
         fnSp_InsertAdGroups($grp)
@@ -46,10 +41,27 @@ function fnLocal_ADComputersUsersAndGroups_DeltaChange {
     foreach ($member in $adGroupMembers) {
         fnSp_InsertAdGroupMembers($member)
     }   
+    
+}
+function fnLocal_AdComputers{
     $adComp = fnAD_GetADComputerDetails
     foreach ($comp in $adComp) {
         fnSp_InsertAdComputers($comp)
     }
+}
+function fnLocal_AdUSers{
+    $deltaChangeUser = fnAD_GetUserDetails
+    foreach ($user in $deltaChangeUser) {
+        fnSp_InsertAdUsers($user)
+    }
+
+}
+<#Get Delta changes from AD and insert the changes in SQL#>
+function fnLocal_ADComputersUsersAndGroups_DeltaChange {
+
+    if ( $gHour -eq 17){fnLocal_AdUSers} else {write-host "AD Users update -> not 5pm"}
+    if ( $gHour -eq 18){fnLocal_AdComputers} else {write-host "AD computers update -> not 6pm"}
+    if ( $gHour -eq 19){fnLocal_AdGroups} else {write-host "AD groups update -> not 7pm"}
     if ( $gHour -eq 20){fnInactive_DisableAndMoveOU} else {write-host "AD move -> not 8pm"}
     if ( $gHour -eq 21){fnLocal_DeleteComputersNotInAD} else {write-host "Delete Computer -> not 9pm"}
     if ( $gHour -eq 22){fnInactive_RemoveProtection} else {write-host "Remove Protection -> not 10pm"}
