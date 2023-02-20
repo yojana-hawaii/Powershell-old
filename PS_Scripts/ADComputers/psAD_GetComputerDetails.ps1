@@ -46,10 +46,10 @@ function fnLocal_OrganizeADProperties($pComputerList){
 
 function fnAD_GetADComputerDetails{
     $dc = fnConfig_GetPrimaryDC
-    $date = (Get-Date).AddDays(-1)
+    # $date = (Get-Date).AddDays(-1)
 
     write-host "Getting list of all computers from " $dc
-    $adProperties = Get-ADComputer -Filter {whenChanged -gt $date }  -Properties * -server $dc #-ResultSetSize 20
+    $adProperties = Get-ADComputer -Filter * -Properties * -server $dc #-ResultSetSize 20
     $adProperties = fnLocal_OrganizeADProperties($adProperties)
 
     return $adProperties
