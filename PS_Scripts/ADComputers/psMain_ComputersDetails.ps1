@@ -59,7 +59,7 @@ function fnLocal_AdUSers{
 <#Get Delta changes from AD and insert the changes in SQL#>
 function fnLocal_ADComputersUsersAndGroups_DeltaChange {
 
-    if ( $gHour -eq 17){fnLocal_AdUSers} else {write-host "AD Users update -> not 5pm"}
+    if ( $gHour % 2 -eq 0){fnLocal_AdUSers} else {write-host "AD Users update -> not even hours"}
     if ( $gHour -eq 18){fnLocal_AdComputers} else {write-host "AD computers update -> not 6pm"}
     if ( $gHour -eq 19){fnLocal_AdGroups} else {write-host "AD groups update -> not 7pm"}
     if ( $gHour -eq 20){fnInactive_DisableAndMoveOU} else {write-host "AD move -> not 8pm"}
