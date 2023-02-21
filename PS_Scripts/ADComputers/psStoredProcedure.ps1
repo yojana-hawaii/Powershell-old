@@ -107,6 +107,30 @@ function fnSp_DeleteComputersNotInAD($pADDetails){
     }   
     return $sqlResult
 }
+function fnSp_GetVPNComputers($pSubnet){
+    try{
+        $conn = fnLocal_GetSQLConnection
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spGet_psSpecificSubnet"
+
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@Subnet", [System.Data.SqlDbType]::Varchar, 100)))|Out-Null
+
+        $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($pSubnet)
+
+        $cmd.CommandTimeout = 0
+        $result = $cmd.ExecuteReader()
+        
+        $data = New-Object System.Data.DataTable
+        $data.Load($result)
+    }catch{
+        write-host "Computers on VPN Subnet sp failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
+    }   
+    return $data
+}
 
 
 function fnSp_InsertAdComputers($pADDetails){
