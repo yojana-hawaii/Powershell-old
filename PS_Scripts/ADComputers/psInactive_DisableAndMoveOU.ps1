@@ -22,7 +22,7 @@ function fnInactive_RemoveProtection {
     foreach ($comp in $365Plus) {
         write-host "disable .. " $comp.Name
         Get-ADComputer -Identity $comp.Name | Set-ADObject -ProtectedFromAccidentalDeletion $false
-        Remove-ADComputer -Identity $comp.Name -Confirm:$False
+        #Remove-ADComputer -Identity $comp.Name -Confirm:$False
     }
 }
 function fnInactive_DisableAndMoveOU{
