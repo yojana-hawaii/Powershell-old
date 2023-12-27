@@ -132,6 +132,27 @@ function fnSp_GetVPNComputers($pSubnet){
     return $data
 }
 
+function fnSp_GetComputersWithHpDrivers(){
+    try{
+        $conn = fnLocal_GetSQLConnection
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spGet_psComputersWithHpDrivers"
+        
+        $cmd.CommandTimeout = 0
+        $result = $cmd.ExecuteReader()
+        
+        $data = New-Object System.Data.DataTable
+        $data.Load($result)
+    }catch{
+        write-host "Computers Hp scan driver sp failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
+    }   
+    return $data
+}
+
 
 function fnSp_InsertAdComputers($pADDetails){
     try{
