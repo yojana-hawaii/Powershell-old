@@ -1,7 +1,8 @@
 . "$PSScriptRoot\psStoredProcedure.ps1"
+. "$PSScriptRoot\psConfig.ps1"
 
-$MODIFIED_S3_FILE = "\\kphc-srvfs01\it\05_Ayush\Powershell\PS_Scripts\ADComputers\HP_ScanApp\s3\ScanApp.ini"
-$MODIFIED_S4_FILE = "\\kphc-srvfs01\it\05_Ayush\Powershell\PS_Scripts\ADComputers\HP_ScanApp\s4\ScanApp.ini"
+$MODIFIED_S3_FILE = fnConfig_s3FileLocation
+$MODIFIED_S4_FILE = fnConfig_s4FileLocation
 $SCANNER_PROFILE_NAME = "ATHENA_SCAN"
 $DEFAULT_USERNAME = "newUser"
 
@@ -15,7 +16,6 @@ function fnLocal_CopyModifiedDefaultFileIfNotExists($srcIniFile, $dstIniFile, $d
     if(-not(Test-Path -path $dstIniFile)){
         Copy-Item -Path $srcIniFile -Destination $dstIniFilePath
     }
-    $x = Test-Path -path $dstIniFile
     return
 }
 function fnLocal_CheckNecessaryStringExistsInFile($iniFile, $str){

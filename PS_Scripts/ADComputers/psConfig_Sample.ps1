@@ -46,3 +46,12 @@ function fnConfig_GetThinClientOU{
 function fnConfig_GetWorkstationOU{
     return "OU=Workstations_OU1,DC=example,DC=com", "OU=Workstations_OU1,DC=example,DC=com", "OU=Disabled Computer,DC=example,DC=com"
 }
+
+function fnConfig_s3FileLocation{
+    $s3FileLocation = "\\Location\PS_Scripts\ADComputers\HP_ScanApp\s3\ScanApp.ini"
+    return $s3FileLocation
+ }
+ function fnConfig_s4FileLocation{
+    $s4_fileLocation = "\\Location\PS_Scripts\ADComputers\HP_ScanApp\s4\ScanApp.ini"
+    return $s4_fileLocation
+ }
