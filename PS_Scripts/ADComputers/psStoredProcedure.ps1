@@ -152,6 +152,26 @@ function fnSp_GetComputersWithHpDrivers(){
     }   
     return $data
 }
+function fnSp_GetProviders(){
+    try{
+        $conn = fnLocal_GetSQLConnection
+        $cmd = $conn.CreateCommand()
+        $cmd.CommandType = 'StoredProcedure'
+        $cmd.CommandText = "dbo.spGetProviders"
+        
+        $cmd.CommandTimeout = 0
+        $result = $cmd.ExecuteReader()
+        
+        $data = New-Object System.Data.DataTable
+        $data.Load($result)
+    }catch{
+        write-host "Providers sp failed"
+        Write-Host $Error[0].Exception.Message
+    }finally{
+        fnLocal_CloseSqlConnection -conn $conn -cmd $cmd
+    }   
+    return $data
+}
 
 
 function fnSp_InsertAdComputers($pADDetails){
