@@ -76,10 +76,10 @@ function fnMissingSlip_PerProvider($prov){
     $bh = $temp[1]
 
     if($bh -eq 1){
-        $CC = $BH_CC + " " + $med_CC
+        $CC = $BH_CC + " " + $med_CC + " " + $FROM
     }
     else {
-        $CC = $med_CC
+        $CC = $med_CC + " " + $FROM
     }
 
     if($provider.email -eq '') {fnMissingSlip_ProviderEmailMissing -provider $ProviderName}
@@ -90,20 +90,15 @@ function fnMissingSlip_PerProvider($prov){
     $htmltable = fnMissingSlip_OrganizeInTable -data $provList
 
     $SUBJECT = $ProviderName + " - " + $encounterCount + " open encounters"
-    $BODY = "Sample email for test. 
-    <br><br>
-    Real email<br> 
-        TO: $email<br> 
-        From: $FROM <br>
-        CC: $CC<br>
+    $BODY = "
         <br><br>
-    Good Morning, This is an automated email. $encounterCount visits between $oldest and $newest are incomplete, missing e&m code or diagnosis. Thank you.
+    Hello, This is an automated email. $encounterCount visits between $oldest and $newest are incomplete, missing e&m code or diagnosis. Thank you.
     <br><br>
     " + $htmltable
      write-host $subject
      write-host $body 
     
-    Send-MailMessage -smtpserver $SMTP -from $me -to $FROM -cc $me -subject $SUBJECT -body $BODY -bodyashtml
+    Send-MailMessage -smtpserver $SMTP -from $FROM -to $email -cc $CC -subject $SUBJECT -body $BODY -bodyashtml
 }
 
 
