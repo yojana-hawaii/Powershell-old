@@ -9,6 +9,7 @@
 . "$PSScriptRoot\psMonitor_GetDetails.ps1"
 . "$PSScriptRoot\psUsers_GetComputerUsers.ps1"
 . "$PSScriptRoot\psAD_GetUsersAndGroups.ps1"
+. "$PSScriptRoot\psDisableDormantUser.ps1"
 
 $gStart_time = fnTest_GetCurrentTime
 $gHour = Get-Date -UFormat "%H"
@@ -58,10 +59,10 @@ function fnLocal_AdUSers{
 }
 <#Get Delta changes from AD and insert the changes in SQL#>
 function fnLocal_ADComputersUsersAndGroups_DeltaChange {
-
+    
     if ( $gHour % 2 -eq 0){fnLocal_AdUSers} else {write-host "AD Users update -> not even hours"}
-    if ( $gHour -eq 18){fnLocal_AdComputers} else {write-host "AD computers update -> not 6pm"}
-    if ( $gHour -eq 19){fnLocal_AdGroups} else {write-host "AD groups update -> not 7pm"}
+    if ( $gHour % 2 -eq 1){fnLocal_AdComputers} else {write-host "AD computers update -> not 6pm"}
+    if ( $gHour -eq 19){fnLocal_AdGroups; fnDisableDormantUser} else {write-host "AD groups update -> not 7pm"}
     if ( $gHour -eq 20){fnInactive_DisableAndMoveOU} else {write-host "AD move -> not 8pm"}
     if ( $gHour -eq 21){fnLocal_DeleteComputersNotInAD} else {write-host "Delete Computer -> not 9pm"}
     if ( $gHour -eq 22){fnInactive_RemoveProtection} else {write-host "Remove Protection -> not 10pm"}
