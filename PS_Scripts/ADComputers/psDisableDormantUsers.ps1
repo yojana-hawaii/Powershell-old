@@ -142,5 +142,3 @@ function fnDisableDormantUser {
 
     #### fnLocal_FindDormantUsers -ou $baseOU -userType "All Users"
 }
-
-fnDisableDormantUser
