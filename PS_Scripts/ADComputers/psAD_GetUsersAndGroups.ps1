@@ -1,5 +1,5 @@
 
-$date = (Get-Date).AddHours(-1)
+$date = (Get-Date).AddHours(-8)
 
 function fnAD_GetUserDetails {  
     
