@@ -14,22 +14,22 @@ foreach($user in $adUsers){
 }
     
 
-# $adgroups = fnAD_GetGroups
-# foreach($grp in $adgroups){
-#     # $grp
-#     fnSp_InsertAdGroups($grp)
-# }
+$adgroups = fnAD_GetGroups
+foreach($grp in $adgroups){
+    # $grp
+    fnSp_InsertAdGroups($grp)
+}
 
-# $adGroupMembers = fnAd_GetGroupMembers
-# foreach($member in $adGroupMembers){
-#     # $member
-#     fnSp_InsertAdGroupMembers($member)
-# }
+$adGroupMembers = fnAd_GetGroupMembers
+foreach($member in $adGroupMembers){
+    # $member
+    fnSp_InsertAdGroupMembers($member)
+}
 
-# $deltaChangeUser = fnAD_GetUserDetails_Delta
-# foreach($user in $deltaChangeUser){
-#     fnSp_InsertAdUsers($user)
-# }
+$deltaChangeUser = fnAD_GetUserDetails_Delta
+foreach($user in $deltaChangeUser){
+    fnSp_InsertAdUsers($user)
+}
 
 
 
