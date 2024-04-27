@@ -101,4 +101,4 @@ function fnHp_UpdateScannerProfile{
 
 # fnHp_UpdateScannerProfile
 
-fnLocal_Main -compName "710-2FD01-22"
+fnLocal_Main -compName "compName"
