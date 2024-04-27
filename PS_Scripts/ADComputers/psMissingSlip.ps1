@@ -25,14 +25,17 @@ function fnMissingSlip_FindEmail($name){
             }
         }
     }
-
-    if ($name -eq "Sato, Darrin"){
-        $email = "dsato@kphc.org"
+    
+    $user1 = fnConfig_GetUser1Name
+    $email1 = fnConfig_getUser1Email
+    if ($name -eq $user1){
+        $email = $email1
         $bh = 1
     }
-
-    if ($name -eq "Yamamoto-Kubo, Tracey"){
-        $email = "tyamamoto@kphc.org"
+    $user2 = fnConfig_GetUser2Name
+    $email2 = fnConfig_getUser2Email 
+    if ($name -eq $user2 ){
+        $email = $email2
         $bh = 0
     }
 
@@ -95,10 +98,10 @@ function fnMissingSlip_PerProvider($prov){
     Hello, This is an automated email. $encounterCount visits between $oldest and $newest are incomplete, missing e&m code or diagnosis. Thank you.
     <br><br>
     " + $htmltable
-     write-host $subject
-     write-host $body 
+    #  write-host $CC.Split(';')
+    #  write-host $body 
     
-    Send-MailMessage -smtpserver $SMTP -from $FROM -to $email -cc $CC -subject $SUBJECT -body $BODY -bodyashtml
+    Send-MailMessage -smtpserver $SMTP -from $FROM -to $email -cc $CC.Split(';') -subject $SUBJECT -body $BODY -bodyashtml
 }
 
 
