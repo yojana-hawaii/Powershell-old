@@ -1,9 +1,11 @@
 
-$date = (Get-Date).AddHours(-8)
+$dateUserchange = (Get-Date).AddHours(-8)
+$dateGroupchange = (Get-Date).AddHours(-26)
+
 
 function fnAD_GetUserDetails {  
     
-    $users = Get-ADUser -Filter {whenChanged -gt $date } -Properties * |
+    $users = Get-ADUser -Filter {whenChanged -gt $dateUserchange } -Properties * |
                 Select-Object  CanonicalName, sAMAccountName, GivenName, SurName, DisplayName, `
                 emailAddress, DistinguishedName, StreetAddress,  `
                 HomePhone, MobilePhone, OfficePhone, Fax,`
@@ -18,12 +20,12 @@ function fnAD_GetUserDetails {
     return $users
 }
 function fnAD_GetGroups {
-    $groups = Get-ADGroup -Filter {whenChanged -gt $date } -Properties * |
+    $groups = Get-ADGroup -Filter {whenChanged -gt $dateGroupchange } -Properties * |
                 Select-Object CanonicalName, sAMAccountName, Name, mail, DistinguishedName, Description, GroupCategory, GroupScope, whenCreated
     return $groups
 }
 function fnAd_GetGroupMembers {
-    $groups = Get-ADGroup -Filter {whenChanged -gt $date } -Properties *  | 
+    $groups = Get-ADGroup -Filter {whenChanged -gt $dateGroupchange } -Properties *  | 
                 Select-Object sAMAccountName 
     $GroupMembers = @()
     foreach($grp in $groups){

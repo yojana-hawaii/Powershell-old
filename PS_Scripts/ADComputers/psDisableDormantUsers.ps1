@@ -19,10 +19,10 @@ function fnLocal_PrintUser {
     param (
         $users
     )
-    write-host "here in test"
+    write-host "here in Print User"
     foreach($user in $users) {
-        $bool = $user.Created.AddDays(14) -ge $gNow
-        write-host $user.GivenName $user.Surname "status" $user.Enabled "login" $user.LastLogonDate "created" $user.Created " +14 " $user.Created.AddDays(14) "today " $gNow "created 14 days: "  $bool
+        # $bool = $user.Created.AddDays(14) -ge $gNow
+        write-host $user.GivenName $user.Surname "; Enabled:" $user.Enabled "; Last login:" $user.LastLogonDate "; Date Created" $user.Created "; Disable if no Login by" $user.Created.AddDays(14)
     }
     write-host ""
 }
@@ -96,7 +96,7 @@ function fnLocal_ExcludeNewUserAccounts {
     
     if ($users.count -le 0 ){
         write-host $userType "dormant but those accounts created last 14 days"
-        return
+        return ""
     }
     fnLocal_PrintUser -users $users
     fnLocal_DisableUserFromActiveDirection  -users $users -userType $userType
@@ -107,15 +107,18 @@ function fnLocal_GetAdditionalADUserDetails {
         $users,
         $userType
     )    
-    $users = $users | Get-ADUser -Identity { $_ } -Properties *
-
-    Test-Print-User -users $users
-    if ($users.count -le 0 ){
+    $totalUsers = $users.count
+    write-host "dormant - " $totalUsers
+    if (0 -eq $totalUsers -or $null -eq $totalUsers){
         write-host $userType "- no dormant period."
-        return
+        return ""
     }
-
+    $users = $users | Get-ADUser -Identity { $_ } -Properties *
+    fnLocal_PrintUser $users
     fnLocal_ExcludeNewUserAccounts -users $users -userType $userType
+
+    write-host "X"
+    return
 }
 
 function fnLocal_FindDormantUsers {
@@ -135,8 +138,11 @@ function fnLocal_FindDormantUsers {
 }
 
 function fnDisableDormantUser {
+    write-host "Start Employees"
     fnLocal_FindDormantUsers -ou $employeeOU -userType "Employees"
+    write-host "Start Students"
     fnLocal_FindDormantUsers -ou $studentOU -userType "Students"
+    write-host "Start Vendors"
     fnLocal_FindDormantUsers -ou $vendorOU -userType "Vendors"
 
 

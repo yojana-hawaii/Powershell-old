@@ -61,9 +61,9 @@ function fnLocal_AdUSers{
 <#Get Delta changes from AD and insert the changes in SQL#>
 function fnLocal_ADComputersUsersAndGroups_DeltaChange {
     Write-Host $gHour " hours"
-    if ( $gHour % 4 -eq 0){write-host "AD Users update -> yes even hours"; fnLocal_AdUSers} else {write-host "AD Users update -> not even hours"}
-    if ( $gHour % 2 -eq 1){write-host "AD computers update -> yes odd hours"; fnLocal_AdComputers} else {write-host "AD computers update -> not odd hours"}
-    if ( $gHour % 19 -eq 1){write-host "AD groups update -> yes 7pm"; fnLocal_AdGroups; fnDisableDormantUser} else {write-host "AD groups update -> no not 7pm"}
+    if ( $gHour % 4 -eq 3){write-host "AD Users update -> yes even hours"; fnLocal_AdUSers} else {write-host "AD Users update -> not even hours"}
+    if ( $gHour % 2 -eq 3){write-host "AD computers update -> yes odd hours"; fnLocal_AdComputers} else {write-host "AD computers update -> not odd hours"}
+    if ( $gHour % 14 -eq 0){write-host "AD groups update -> yes 7pm"; fnLocal_AdGroups; fnDisableDormantUser} else {write-host "AD groups update -> no not 7pm"}
     if ( $gHour % 20 -eq 0){write-host "AD move -> yes 8pm"; fnInactive_DisableAndMoveOU; fnRemoveUsersFromGroup} else {write-host "AD move -> not 8pm"}
     if ( $gHour % 21 -eq 0){write-host "Delete Computer -> yes 9pm"; fnLocal_DeleteComputersNotInAD} else {write-host "Delete Computer -> not 9pm"}
     if ( $gHour % 22 -eq 0){write-host "Remove Protection -> yes 10pm"; fnInactive_RemoveProtection} else {write-host "Remove Protection -> not 10pm"}
