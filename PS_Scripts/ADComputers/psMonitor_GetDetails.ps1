@@ -1,13 +1,5 @@
 . "$PSScriptRoot\psStoredProcedure.ps1"
-function fnLocal_DecodeAscii{
-    $retStr = "X"
-    if($args[0] -is [System.Array]){
-        $retStr = [System.Text.Encoding]::ASCII.GetString($Args[0])
-    } else {
-       $retStr =  "not found"
-    }
-    return $retStr
-}
+
 function fnMonitor_GetMonitorDetails($pComputer){
     $CompName = $pComputer.Name
     $CompSAMA = $pComputer.sAMAccountName
@@ -27,9 +19,9 @@ function fnMonitor_GetMonitorDetails($pComputer){
             $localMonitor += [PSCustomObject]@{
                 Name = $CompName
                 sAMAccountName = $CompSAMA
-                MonitorManufacturer = fnLocal_DecodeAscii ($monitor.ManufacturerName -notmatch 0)
-                MonitorName = fnLocal_DecodeAscii ($monitor.UserFriendlyName -notmatch 0)
-                MonitorSerial = fnLocal_DecodeAscii ($monitor.SerialNumberID -notmatch 0)
+                MonitorManufacturer = Decode-Ascii($monitor.ManufacturerName -notmatch 0)
+                MonitorName = Decode-Ascii($monitor.UserFriendlyName -notmatch 0)
+                MonitorSerial = Decode-Ascii($monitor.SerialNumberID -notmatch 0)
                 MonitorYear = $monitor.YearOfManufacture
                 Counter = $counter
             }
