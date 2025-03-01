@@ -74,6 +74,8 @@ function fnHardware_GetLocalComputerDetails($pComputer){
             $disk_class = Get-WmiObject -ClassName Win32_DiskDrive -ComputerName $localCompName | select-object Model, @{Name = "HDD_Size_GB"; Exp={$_.Size / 1Gb -as [int]}}
             $physicalDisk_class = Get-WmiObject -ClassName MSFT_PhysicalDisk -ComputerName $localCompName -Namespace root\Microsoft\Windows\Storage  | Select-Object MediaType
             $tpm_class = Get-WmiObject -ClassName Win32_Tpm -Namespace root\CIMV2\Security\MicrosoftTpm -ComputerName $localCompName -Authentication PacketPrivacy | Select-Object IsEnabled_InitialValue, SpecVersion
+            $physicalMemoryArray = Get-WmiObject -Class win32_physicalmemoryArray -computername $localCompName | Select-Object maxCapacityEx, MemoryDevices
+            $physicalMemory = Get-WmiObject -Class win32_physicalmemory -computername $localCompName | Select-Object *
             write-host "WMI complete"
         } catch {
             Write-Host "WMI Failed"
@@ -118,6 +120,9 @@ function fnHardware_GetLocalComputerDetails($pComputer){
             Manufacturer = $computerSystem_class.Manufacturer
             Model = $computerSystem_class.Model
             RAM_GB = [MATH]::Round( ($computerSystem_class.TotalPhysicalMemory / 1Gb), 2 )
+            TotalRamSlot = $physicalMemoryArray.MemoryDevices
+            RamSlotUsed = if($null -eq $physicalMemory.count){1} else {$physicalMemory.count}
+            # RamUpgradeAvailable = [MATH]::Round( ($RamUpgradeAvailable.maxCapacityEx / 1Gb), 2 )
             VM = if ($computerSystem_class.Model -like 'virtual*' -or $computerSystem_class.Model -like "VMWare*") {1} else {0}
             CurrentUser = $computerSystem_class.UserName
             WakeUpType = fnLocal_WakupTpye($computerSystem_class.WakeUpType)

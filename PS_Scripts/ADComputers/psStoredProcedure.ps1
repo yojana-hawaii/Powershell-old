@@ -276,6 +276,10 @@ function fnSp_InsertHardwareDetails($pHardwareDetails){
         $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@LastPatchKb", [System.Data.SqlDbType]::Varchar, 50)))|Out-Null
         $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@LastPatchDate", [System.Data.SqlDbType]::Varchar, 50)))|Out-Null
         
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@TotalRamSlot", [System.Data.SqlDbType]::Varchar, 50)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@RamSlotUsed", [System.Data.SqlDbType]::Varchar, 50)))|Out-Null
+        
+
         $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($pHardwareDetails.sAMAccountName)
         $cmd.Parameters[1].Value = fnLocal_GetStringFromObject($pHardwareDetails.Name)
         $cmd.Parameters[2].Value = fnLocal_GetStringFromObject($pHardwareDetails.SerialNumber)
@@ -317,6 +321,9 @@ function fnSp_InsertHardwareDetails($pHardwareDetails){
         $cmd.Parameters[34].Value = fnLocal_GetStringFromObject($pHardwareDetails.LastPatchKb)
         $cmd.Parameters[35].Value = fnLocal_GetStringFromObject($pHardwareDetails.LastPatchDate)
 
+        $cmd.Parameters[36].Value = fnLocal_GetStringFromObject($pHardwareDetails.TotalRamSlot)
+        $cmd.Parameters[37].Value = fnLocal_GetStringFromObject($pHardwareDetails.RamSlotUsed)
+        
         $cmd.ExecuteNonQuery()   
     }catch{
         write-host "Insert hardware details sp failed"
