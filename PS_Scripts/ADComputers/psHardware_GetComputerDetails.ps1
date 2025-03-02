@@ -76,6 +76,7 @@ function fnHardware_GetLocalComputerDetails($pComputer){
             $tpm_class = Get-WmiObject -ClassName Win32_Tpm -Namespace root\CIMV2\Security\MicrosoftTpm -ComputerName $localCompName -Authentication PacketPrivacy | Select-Object IsEnabled_InitialValue, SpecVersion
             $physicalMemoryArray = Get-WmiObject -Class win32_physicalmemoryArray -computername $localCompName | Select-Object maxCapacityEx, MemoryDevices
             $physicalMemory = Get-WmiObject -Class win32_physicalmemory -computername $localCompName | Select-Object *
+            $mac = Get-WmiObject -Class win32_networkadapter -ComputerName $localCompName | Where-Object { ($null -ne $_.macaddress) -and  ($null -eq $_.speed) } | Select-Object  macAddress 
             write-host "WMI complete"
         } catch {
             Write-Host "WMI Failed"
@@ -128,6 +129,7 @@ function fnHardware_GetLocalComputerDetails($pComputer){
             WakeUpType = fnLocal_WakupTpye($computerSystem_class.WakeUpType)
             
             Processor = $processor_class.Name
+            MacAddresses = $mac.macAddress -join ", "
 
             LastReboot  = [Management.ManagementDateTimeConverter]::ToDateTime($os_class.LastBootUpTime)
             EncryptionLevel = $os_class.EncryptionLevel

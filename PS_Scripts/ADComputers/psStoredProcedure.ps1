@@ -278,6 +278,8 @@ function fnSp_InsertHardwareDetails($pHardwareDetails){
         
         $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@TotalRamSlot", [System.Data.SqlDbType]::Varchar, 50)))|Out-Null
         $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@RamSlotUsed", [System.Data.SqlDbType]::Varchar, 50)))|Out-Null
+        $cmd.Parameters.Add((New-Object Data.SqlClient.SqlParameter("@MacAddresses", [System.Data.SqlDbType]::Varchar, 500)))|Out-Null
+        
         
 
         $cmd.Parameters[0].Value = fnLocal_GetStringFromObject($pHardwareDetails.sAMAccountName)
@@ -323,6 +325,7 @@ function fnSp_InsertHardwareDetails($pHardwareDetails){
 
         $cmd.Parameters[36].Value = fnLocal_GetStringFromObject($pHardwareDetails.TotalRamSlot)
         $cmd.Parameters[37].Value = fnLocal_GetStringFromObject($pHardwareDetails.RamSlotUsed)
+        $cmd.Parameters[38].Value = fnLocal_GetStringFromObject($pHardwareDetails.MacAddresses)
         
         $cmd.ExecuteNonQuery()   
     }catch{
